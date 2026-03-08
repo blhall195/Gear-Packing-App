@@ -10,6 +10,8 @@ interface TripContextType {
 
 const defaultAnswers: TripAnswers = {
   activities: [],
+  climbingType: [],
+  cavingType: [],
   weather: [],
   duration: null,
   shelter: null,
@@ -18,12 +20,30 @@ const defaultAnswers: TripAnswers = {
   cooking: null,
 };
 
+const STORAGE_KEY = 'trip-answers';
+
+function loadAnswers(): TripAnswers {
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored) return JSON.parse(stored) as TripAnswers;
+  } catch { /* ignore */ }
+  return defaultAnswers;
+}
+
 const TripContext = createContext<TripContextType | null>(null);
 
 export function TripProvider({ children }: { children: ReactNode }) {
-  const [answers, setAnswers] = useState<TripAnswers>(defaultAnswers);
+  const [answers, setAnswersState] = useState<TripAnswers>(loadAnswers);
 
-  const resetAnswers = () => setAnswers(defaultAnswers);
+  const setAnswers = (a: TripAnswers) => {
+    setAnswersState(a);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(a));
+  };
+
+  const resetAnswers = () => {
+    setAnswersState(defaultAnswers);
+    localStorage.removeItem(STORAGE_KEY);
+  };
 
   return (
     <TripContext.Provider value={{ answers, setAnswers, resetAnswers }}>

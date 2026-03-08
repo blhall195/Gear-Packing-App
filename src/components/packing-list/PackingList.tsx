@@ -1,18 +1,16 @@
 import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useTrip } from '../../context/TripContext';
+import { useGear } from '../../context/GearContext';
 import { matchGear } from '../../logic/matching';
-import type { GearItem } from '../../logic/types';
 import { CATEGORY_ORDER } from '../../logic/types';
 import CategoryGroup from './CategoryGroup';
-import gearData from '../../assets/gear-data.json';
-
-const items = gearData as GearItem[];
 
 export default function PackingList() {
   const { answers } = useTrip();
+  const { items } = useGear();
 
-  const matched = useMemo(() => matchGear(items, answers), [answers]);
+  const matched = useMemo(() => matchGear(items, answers), [items, answers]);
 
   const grouped = useMemo(() => {
     const groups: Record<string, GearItem[]> = {};

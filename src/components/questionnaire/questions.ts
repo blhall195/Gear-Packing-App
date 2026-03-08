@@ -26,6 +26,24 @@ export function buildQuestions(availableOptions: Record<string, string[]>): Ques
       options: toOpts(availableOptions.activities || []),
     },
     {
+      field: 'climbingType',
+      label: 'What type of climbing?',
+      selectMode: 'multi',
+      options: mergeOpts(['trad', 'sport', 'bouldering', 'scrambling'], availableOptions.climbingType || []),
+      skip: (a) => !a.activities || !(a.activities as string[]).includes('climbing'),
+    },
+    {
+      field: 'cavingType',
+      label: 'What type of caving?',
+      selectMode: 'multi',
+      options: [
+        { value: 'srt_trip', label: 'SRT Trip' },
+        { value: 'non_srt_trip', label: 'Non-SRT Trip' },
+        ...toOpts((availableOptions.cavingType || []).filter(v => v !== 'srt_trip' && v !== 'non_srt_trip')),
+      ],
+      skip: (a) => !a.activities || !(a.activities as string[]).includes('caving'),
+    },
+    {
       field: 'weather',
       label: "What are the conditions like?",
       selectMode: 'multi',

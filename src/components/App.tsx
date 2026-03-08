@@ -1,5 +1,6 @@
 import { HashRouter, Routes, Route } from 'react-router-dom';
 import { TripProvider } from '../context/TripContext';
+import { GearProvider } from '../context/GearContext';
 import Layout from './Layout';
 import Questionnaire from './questionnaire/Questionnaire';
 import PackingList from './packing-list/PackingList';
@@ -7,6 +8,7 @@ import GearEditor from './gear-editor/GearEditor';
 
 export default function App() {
   return (
+    <GearProvider>
     <TripProvider>
       <HashRouter>
         <Routes>
@@ -18,5 +20,6 @@ export default function App() {
         </Routes>
       </HashRouter>
     </TripProvider>
+    </GearProvider>
   );
 }

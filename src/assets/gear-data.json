@@ -5,12 +5,14 @@
     "category": "Essentials",
     "always": true,
     "activities": [],
+    "climbingType": [],
     "weather": [],
     "duration": [],
     "shelter": [],
     "sleepProvision": [],
     "location": [],
-    "cooking": []
+    "cooking": [],
+    "cavingType": []
   },
   {
     "id": "2",
@@ -18,12 +20,14 @@
     "category": "Essentials",
     "always": true,
     "activities": [],
+    "climbingType": [],
     "weather": [],
     "duration": [],
     "shelter": [],
     "sleepProvision": [],
     "location": [],
-    "cooking": []
+    "cooking": [],
+    "cavingType": []
   },
   {
     "id": "3",
@@ -31,12 +35,14 @@
     "category": "Essentials",
     "always": true,
     "activities": [],
+    "climbingType": [],
     "weather": [],
     "duration": [],
     "shelter": [],
     "sleepProvision": [],
     "location": [],
-    "cooking": []
+    "cooking": [],
+    "cavingType": []
   },
   {
     "id": "4",
@@ -44,25 +50,35 @@
     "category": "Essentials",
     "always": true,
     "activities": [],
+    "climbingType": [],
     "weather": [],
     "duration": [],
     "shelter": [],
     "sleepProvision": [],
     "location": [],
-    "cooking": []
+    "cooking": [],
+    "cavingType": []
   },
   {
     "id": "5",
     "name": "Headtorch",
     "category": "Essentials",
     "always": false,
-    "activities": ["climbing", "caving", "hiking"],
+    "activities": [
+      "climbing",
+      "caving",
+      "hiking"
+    ],
+    "climbingType": [],
     "weather": [],
-    "duration": ["multi_day"],
+    "duration": [
+      "multi_day"
+    ],
     "shelter": [],
     "sleepProvision": [],
     "location": [],
-    "cooking": []
+    "cooking": [],
+    "cavingType": []
   },
   {
     "id": "6",
@@ -70,12 +86,14 @@
     "category": "Electronics",
     "always": true,
     "activities": [],
+    "climbingType": [],
     "weather": [],
     "duration": [],
     "shelter": [],
     "sleepProvision": [],
     "location": [],
-    "cooking": []
+    "cooking": [],
+    "cavingType": []
   },
   {
     "id": "7",
@@ -83,12 +101,19 @@
     "category": "Electronics",
     "always": false,
     "activities": [],
+    "climbingType": [],
     "weather": [],
-    "duration": ["multi_day"],
-    "shelter": ["tent", "bothy"],
+    "duration": [
+      "multi_day"
+    ],
+    "shelter": [
+      "tent",
+      "bothy"
+    ],
     "sleepProvision": [],
     "location": [],
-    "cooking": []
+    "cooking": [],
+    "cavingType": []
   },
   {
     "id": "8",
@@ -96,12 +121,17 @@
     "category": "Clothing",
     "always": false,
     "activities": [],
-    "weather": ["cold", "snow"],
+    "climbingType": [],
+    "weather": [
+      "cold",
+      "snow"
+    ],
     "duration": [],
     "shelter": [],
     "sleepProvision": [],
     "location": [],
-    "cooking": []
+    "cooking": [],
+    "cavingType": []
   },
   {
     "id": "9",
@@ -109,12 +139,17 @@
     "category": "Clothing",
     "always": false,
     "activities": [],
-    "weather": ["cold", "snow"],
+    "climbingType": [],
+    "weather": [
+      "cold",
+      "snow"
+    ],
     "duration": [],
     "shelter": [],
     "sleepProvision": [],
     "location": [],
-    "cooking": []
+    "cooking": [],
+    "cavingType": []
   },
   {
     "id": "10",
@@ -122,12 +157,17 @@
     "category": "Clothing",
     "always": false,
     "activities": [],
-    "weather": ["rain", "snow"],
+    "climbingType": [],
+    "weather": [
+      "rain",
+      "snow"
+    ],
     "duration": [],
     "shelter": [],
     "sleepProvision": [],
     "location": [],
-    "cooking": []
+    "cooking": [],
+    "cavingType": []
   },
   {
     "id": "11",
@@ -135,12 +175,17 @@
     "category": "Clothing",
     "always": false,
     "activities": [],
-    "weather": ["rain", "snow"],
+    "climbingType": [],
+    "weather": [
+      "rain",
+      "snow"
+    ],
     "duration": [],
     "shelter": [],
     "sleepProvision": [],
     "location": [],
-    "cooking": []
+    "cooking": [],
+    "cavingType": []
   },
   {
     "id": "12",
@@ -148,12 +193,17 @@
     "category": "Clothing",
     "always": false,
     "activities": [],
-    "weather": ["cold", "snow"],
+    "climbingType": [],
+    "weather": [
+      "cold",
+      "snow"
+    ],
     "duration": [],
     "shelter": [],
     "sleepProvision": [],
     "location": [],
-    "cooking": []
+    "cooking": [],
+    "cavingType": []
   },
   {
     "id": "13",
@@ -161,12 +211,16 @@
     "category": "Clothing",
     "always": false,
     "activities": [],
-    "weather": ["hot"],
+    "climbingType": [],
+    "weather": [
+      "hot"
+    ],
     "duration": [],
     "shelter": [],
     "sleepProvision": [],
     "location": [],
-    "cooking": []
+    "cooking": [],
+    "cavingType": []
   },
   {
     "id": "14",
@@ -174,12 +228,17 @@
     "category": "Clothing",
     "always": false,
     "activities": [],
-    "weather": ["cold", "snow"],
+    "climbingType": [],
+    "weather": [
+      "cold",
+      "snow"
+    ],
     "duration": [],
     "shelter": [],
     "sleepProvision": [],
     "location": [],
-    "cooking": []
+    "cooking": [],
+    "cavingType": []
   },
   {
     "id": "15",
@@ -187,12 +246,17 @@
     "category": "Clothing",
     "always": false,
     "activities": [],
-    "weather": ["cold", "snow"],
+    "climbingType": [],
+    "weather": [
+      "cold",
+      "snow"
+    ],
     "duration": [],
     "shelter": [],
     "sleepProvision": [],
     "location": [],
-    "cooking": []
+    "cooking": [],
+    "cavingType": []
   },
   {
     "id": "16",
@@ -200,12 +264,16 @@
     "category": "Clothing",
     "always": false,
     "activities": [],
+    "climbingType": [],
     "weather": [],
-    "duration": ["multi_day"],
+    "duration": [
+      "multi_day"
+    ],
     "shelter": [],
     "sleepProvision": [],
     "location": [],
-    "cooking": []
+    "cooking": [],
+    "cavingType": []
   },
   {
     "id": "17",
@@ -213,12 +281,16 @@
     "category": "Essentials",
     "always": false,
     "activities": [],
-    "weather": ["hot"],
+    "climbingType": [],
+    "weather": [
+      "hot"
+    ],
     "duration": [],
     "shelter": [],
     "sleepProvision": [],
     "location": [],
-    "cooking": []
+    "cooking": [],
+    "cavingType": []
   },
   {
     "id": "18",
@@ -226,103 +298,155 @@
     "category": "Safety",
     "always": true,
     "activities": [],
+    "climbingType": [],
     "weather": [],
     "duration": [],
     "shelter": [],
     "sleepProvision": [],
     "location": [],
-    "cooking": []
+    "cooking": [],
+    "cavingType": []
   },
   {
     "id": "19",
     "name": "Emergency shelter",
     "category": "Safety",
     "always": false,
-    "activities": ["climbing", "hiking"],
+    "activities": [
+      "climbing",
+      "hiking"
+    ],
+    "climbingType": [],
     "weather": [],
     "duration": [],
     "shelter": [],
     "sleepProvision": [],
     "location": [],
-    "cooking": []
+    "cooking": [],
+    "cavingType": []
   },
   {
     "id": "20",
     "name": "Group shelter",
     "category": "Safety",
     "always": false,
-    "activities": ["climbing", "hiking"],
-    "weather": ["cold", "rain", "snow"],
+    "activities": [
+      "climbing",
+      "hiking"
+    ],
+    "climbingType": [],
+    "weather": [
+      "cold",
+      "rain",
+      "snow"
+    ],
     "duration": [],
     "shelter": [],
     "sleepProvision": [],
     "location": [],
-    "cooking": []
+    "cooking": [],
+    "cavingType": []
   },
   {
     "id": "21",
     "name": "Helmet",
     "category": "Safety",
     "always": false,
-    "activities": ["climbing", "caving", "sailing"],
+    "activities": [
+      "climbing",
+      "caving",
+      "sailing"
+    ],
+    "climbingType": [],
     "weather": [],
     "duration": [],
     "shelter": [],
     "sleepProvision": [],
     "location": [],
-    "cooking": []
+    "cooking": [],
+    "cavingType": []
   },
   {
     "id": "22",
     "name": "Harness",
     "category": "Climbing Gear",
     "always": false,
-    "activities": ["climbing"],
+    "activities": [
+      "climbing"
+    ],
+    "climbingType": [
+      "trad",
+      "sport",
+      "scrambling"
+    ],
     "weather": [],
     "duration": [],
     "shelter": [],
     "sleepProvision": [],
     "location": [],
-    "cooking": []
+    "cooking": [],
+    "cavingType": []
   },
   {
     "id": "23",
     "name": "Rope",
     "category": "Climbing Gear",
     "always": false,
-    "activities": ["climbing"],
+    "activities": [
+      "climbing"
+    ],
+    "climbingType": [
+      "trad",
+      "sport",
+      "scrambling"
+    ],
     "weather": [],
     "duration": [],
     "shelter": [],
     "sleepProvision": [],
     "location": [],
-    "cooking": []
+    "cooking": [],
+    "cavingType": []
   },
   {
     "id": "24",
     "name": "Quickdraws",
     "category": "Climbing Gear",
     "always": false,
-    "activities": ["climbing"],
+    "activities": [
+      "climbing"
+    ],
+    "climbingType": [
+      "trad",
+      "sport"
+    ],
     "weather": [],
     "duration": [],
     "shelter": [],
     "sleepProvision": [],
     "location": [],
-    "cooking": []
+    "cooking": [],
+    "cavingType": []
   },
   {
     "id": "25",
     "name": "Belay device",
     "category": "Climbing Gear",
     "always": false,
-    "activities": ["climbing"],
+    "activities": [
+      "climbing"
+    ],
+    "climbingType": [
+      "trad",
+      "sport"
+    ],
     "weather": [],
     "duration": [],
     "shelter": [],
     "sleepProvision": [],
     "location": [],
-    "cooking": []
+    "cooking": [],
+    "cavingType": []
   },
   {
     "id": "26",
@@ -330,12 +454,18 @@
     "category": "Camping Gear",
     "always": false,
     "activities": [],
+    "climbingType": [],
     "weather": [],
-    "duration": ["multi_day"],
-    "shelter": ["tent"],
+    "duration": [
+      "multi_day"
+    ],
+    "shelter": [
+      "tent"
+    ],
     "sleepProvision": [],
     "location": [],
-    "cooking": []
+    "cooking": [],
+    "cavingType": []
   },
   {
     "id": "27",
@@ -343,38 +473,54 @@
     "category": "Camping Gear",
     "always": false,
     "activities": [],
+    "climbingType": [],
     "weather": [],
-    "duration": ["multi_day"],
-    "shelter": ["tent"],
+    "duration": [
+      "multi_day"
+    ],
+    "shelter": [
+      "tent"
+    ],
     "sleepProvision": [],
     "location": [],
-    "cooking": []
+    "cooking": [],
+    "cavingType": []
   },
   {
     "id": "28",
     "name": "Map",
     "category": "Navigation",
     "always": false,
-    "activities": ["hiking", "climbing"],
+    "activities": [
+      "hiking",
+      "climbing"
+    ],
+    "climbingType": [],
     "weather": [],
     "duration": [],
     "shelter": [],
     "sleepProvision": [],
     "location": [],
-    "cooking": []
+    "cooking": [],
+    "cavingType": []
   },
   {
     "id": "29",
     "name": "Compass",
     "category": "Navigation",
     "always": false,
-    "activities": ["hiking", "climbing"],
+    "activities": [
+      "hiking",
+      "climbing"
+    ],
+    "climbingType": [],
     "weather": [],
     "duration": [],
     "shelter": [],
     "sleepProvision": [],
     "location": [],
-    "cooking": []
+    "cooking": [],
+    "cavingType": []
   },
   {
     "id": "30",
@@ -382,12 +528,19 @@
     "category": "Sleep System",
     "always": false,
     "activities": [],
+    "climbingType": [],
     "weather": [],
-    "duration": ["multi_day"],
+    "duration": [
+      "multi_day"
+    ],
     "shelter": [],
-    "sleepProvision": ["mattress_only", "none"],
+    "sleepProvision": [
+      "mattress_only",
+      "none"
+    ],
     "location": [],
-    "cooking": []
+    "cooking": [],
+    "cavingType": []
   },
   {
     "id": "31",
@@ -395,12 +548,18 @@
     "category": "Sleep System",
     "always": false,
     "activities": [],
+    "climbingType": [],
     "weather": [],
-    "duration": ["multi_day"],
+    "duration": [
+      "multi_day"
+    ],
     "shelter": [],
-    "sleepProvision": ["none"],
+    "sleepProvision": [
+      "none"
+    ],
     "location": [],
-    "cooking": []
+    "cooking": [],
+    "cavingType": []
   },
   {
     "id": "32",
@@ -408,12 +567,19 @@
     "category": "Sleep System",
     "always": false,
     "activities": [],
+    "climbingType": [],
     "weather": [],
-    "duration": ["multi_day"],
+    "duration": [
+      "multi_day"
+    ],
     "shelter": [],
-    "sleepProvision": ["mattress_only", "none"],
+    "sleepProvision": [
+      "mattress_only",
+      "none"
+    ],
     "location": [],
-    "cooking": []
+    "cooking": [],
+    "cavingType": []
   },
   {
     "id": "33",
@@ -421,12 +587,16 @@
     "category": "Cooking",
     "always": false,
     "activities": [],
+    "climbingType": [],
     "weather": [],
     "duration": [],
     "shelter": [],
     "sleepProvision": [],
     "location": [],
-    "cooking": ["self_catered"]
+    "cooking": [
+      "self_catered"
+    ],
+    "cavingType": []
   },
   {
     "id": "34",
@@ -434,12 +604,16 @@
     "category": "Cooking",
     "always": false,
     "activities": [],
+    "climbingType": [],
     "weather": [],
     "duration": [],
     "shelter": [],
     "sleepProvision": [],
     "location": [],
-    "cooking": ["self_catered"]
+    "cooking": [
+      "self_catered"
+    ],
+    "cavingType": []
   },
   {
     "id": "35",
@@ -447,12 +621,16 @@
     "category": "Cooking",
     "always": false,
     "activities": [],
+    "climbingType": [],
     "weather": [],
     "duration": [],
     "shelter": [],
     "sleepProvision": [],
     "location": [],
-    "cooking": ["self_catered"]
+    "cooking": [
+      "self_catered"
+    ],
+    "cavingType": []
   },
   {
     "id": "36",
@@ -460,12 +638,17 @@
     "category": "Cooking",
     "always": false,
     "activities": [],
+    "climbingType": [],
     "weather": [],
     "duration": [],
     "shelter": [],
     "sleepProvision": [],
     "location": [],
-    "cooking": ["self_catered", "provided"]
+    "cooking": [
+      "self_catered",
+      "provided"
+    ],
+    "cavingType": []
   },
   {
     "id": "37",
@@ -473,12 +656,16 @@
     "category": "Cooking",
     "always": false,
     "activities": [],
+    "climbingType": [],
     "weather": [],
     "duration": [],
     "shelter": [],
     "sleepProvision": [],
     "location": [],
-    "cooking": ["self_catered"]
+    "cooking": [
+      "self_catered"
+    ],
+    "cavingType": []
   },
   {
     "id": "38",
@@ -486,12 +673,16 @@
     "category": "Travel Documents",
     "always": false,
     "activities": [],
+    "climbingType": [],
     "weather": [],
     "duration": [],
     "shelter": [],
     "sleepProvision": [],
-    "location": ["abroad"],
-    "cooking": []
+    "location": [
+      "abroad"
+    ],
+    "cooking": [],
+    "cavingType": []
   },
   {
     "id": "39",
@@ -499,12 +690,16 @@
     "category": "Travel Documents",
     "always": false,
     "activities": [],
+    "climbingType": [],
     "weather": [],
     "duration": [],
     "shelter": [],
     "sleepProvision": [],
-    "location": ["abroad"],
-    "cooking": []
+    "location": [
+      "abroad"
+    ],
+    "cooking": [],
+    "cavingType": []
   },
   {
     "id": "40",
@@ -512,11 +707,15 @@
     "category": "Travel Documents",
     "always": false,
     "activities": [],
+    "climbingType": [],
     "weather": [],
     "duration": [],
     "shelter": [],
     "sleepProvision": [],
-    "location": ["abroad"],
-    "cooking": []
+    "location": [
+      "abroad"
+    ],
+    "cooking": [],
+    "cavingType": []
   }
 ]

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { GearItem } from '../../logic/types';
-import { CONDITION_FIELDS } from '../../logic/types';
+import { CONDITION_FIELDS, CATEGORY_FIELDS } from '../../logic/types';
 
 interface Props {
   item: GearItem;
@@ -98,7 +98,10 @@ export default function GearItemForm({ item, allItems, onSave, onCancel }: Props
         </label>
       </div>
 
-      {!draft.always && CONDITION_FIELDS.map((cf) => {
+      {!draft.always && CONDITION_FIELDS.filter((cf) => {
+        const allowed = CATEGORY_FIELDS[draft.category];
+        return !allowed || allowed.includes(cf.key);
+      }).map((cf) => {
         const options = getOptionsForField(allItems, cf.key);
         const selected = (draft as Record<string, unknown>)[cf.key] as string[];
 

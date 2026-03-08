@@ -333,6 +333,35 @@ body {
   gap: 0.5rem;
 }
 
+.gear-warning {
+  font-size: 0.85rem;
+  color: #92400e;
+  background: #fef3c7;
+  border: 1px solid #fde68a;
+  border-radius: var(--radius);
+  padding: 0.5rem 0.75rem;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.gear-warning-close {
+  margin-left: auto;
+  background: none;
+  border: none;
+  color: #92400e;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 0 0.25rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.gear-warning-close:hover {
+  color: #78350f;
+}
+
 .editor-search {
   width: 100%;
   padding: 0.6rem 0.75rem;

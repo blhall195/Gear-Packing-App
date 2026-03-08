@@ -15,11 +15,15 @@ export default function Questionnaire() {
   const [currentStep, setCurrentStep] = useState(0);
   const [draft, setDraft] = useState<Partial<TripAnswers>>({
     activities: [],
+    climbingType: [],
+    cavingType: [],
     weather: [],
   });
 
   const availableOptions = useMemo(() => ({
     activities: extractOptions(items, 'activities'),
+    climbingType: extractOptions(items, 'climbingType'),
+    cavingType: extractOptions(items, 'cavingType'),
     weather: extractOptions(items, 'weather'),
     duration: extractOptions(items, 'duration'),
     shelter: extractOptions(items, 'shelter'),
@@ -46,6 +50,8 @@ export default function Questionnaire() {
     } else {
       const finalAnswers: TripAnswers = {
         activities: (draft.activities as string[]) || [],
+        climbingType: (draft.climbingType as string[]) || [],
+        cavingType: (draft.cavingType as string[]) || [],
         weather: (draft.weather as string[]) || [],
         duration: (draft.duration as string) || null,
         shelter: (draft.shelter as string) || null,
@@ -79,7 +85,7 @@ export default function Questionnaire() {
 
   const handleStartOver = () => {
     resetAnswers();
-    setDraft({ activities: [], weather: [] });
+    setDraft({ activities: [], climbingType: [], weather: [] });
     setCurrentStep(0);
   };
 
