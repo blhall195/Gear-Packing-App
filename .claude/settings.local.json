@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(*)",
+      "Read(*)",
+      "Write(*)",
+      "Edit(*)",
+      "Glob(*)",
+      "Grep(*)",
+      "Bash(cp -r temp-scaffold/* .)",
+      "Bash(cp temp-scaffold/.gitignore .)",
+      "Bash(rm -rf temp-scaffold)",
+      "Bash(npm install)",
+      "Bash(npm install react-router-dom)",
+      "Bash(mkdir -p src/logic src/assets src/components/questionnaire src/components/packing-list src/components/gear-editor src/context src/styles)",
+      "Bash(rm -f src/App.css src/App.tsx src/index.css src/main.tsx)",
+      "Bash(npx tsc --noEmit)",
+      "Bash(npm run build)"
+    ]
+  }
+}
