@@ -42,6 +42,24 @@ body {
   box-shadow: var(--shadow);
 }
 
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.github-link {
+  color: var(--color-text);
+  display: flex;
+  align-items: center;
+  opacity: 0.7;
+  transition: opacity 0.15s;
+}
+
+.github-link:hover {
+  opacity: 1;
+}
+
 .header-title {
   font-size: 1.25rem;
   font-weight: 700;
@@ -72,6 +90,32 @@ body {
 .nav-link.active {
   background: var(--color-primary);
   color: white;
+}
+
+.help-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid var(--color-border);
+  text-decoration: none;
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+  font-weight: 700;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.help-btn:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.help-btn.active {
+  background: var(--color-primary);
+  color: white;
+  border-color: var(--color-primary);
 }
 
 /* Main */
@@ -579,6 +623,48 @@ body {
   gap: 0.5rem;
   padding-top: 0.5rem;
   border-top: 1px solid var(--color-border);
+}
+
+/* Help Page */
+.help-page {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.help-page h2 {
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.help-section {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+  margin-bottom: 1rem;
+  box-shadow: var(--shadow);
+}
+
+.help-section h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-primary);
+  margin-bottom: 0.5rem;
+}
+
+.help-section ol,
+.help-section ul {
+  padding-left: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.9rem;
+  color: var(--color-text);
+}
+
+.help-back {
+  margin-top: 1.5rem;
+  text-align: center;
 }
 
 /* Print */

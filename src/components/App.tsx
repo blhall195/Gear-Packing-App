@@ -5,6 +5,7 @@ import Layout from './Layout';
 import Questionnaire from './questionnaire/Questionnaire';
 import PackingList from './packing-list/PackingList';
 import GearEditor from './gear-editor/GearEditor';
+import Help from './Help';
 
 export default function App() {
   return (
@@ -16,6 +17,7 @@ export default function App() {
             <Route path="/" element={<Questionnaire />} />
             <Route path="/list" element={<PackingList />} />
             <Route path="/editor" element={<GearEditor />} />
+            <Route path="/help" element={<Help />} />
           </Route>
         </Routes>
       </HashRouter>
