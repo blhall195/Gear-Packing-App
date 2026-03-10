@@ -149,7 +149,6 @@ export default function QuestionEditor() {
     if (!parent) return;
 
     const newParentId = parent.parentId; // Could be null (top-level)
-    const newSiblings = getSiblings(questions, newParentId);
     // Insert right after the old parent
     const newOrder = parent.order + 0.5; // Will be normalised
 
