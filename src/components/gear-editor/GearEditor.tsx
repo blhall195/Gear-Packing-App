@@ -6,7 +6,10 @@ import GearItemForm from './GearItemForm';
 import { useGear } from '../../context/GearContext';
 
 function generateId(): string {
-  return crypto.randomUUID();
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID();
+  }
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 10);
 }
 
 function createEmptyItem(category?: string): GearItem {
