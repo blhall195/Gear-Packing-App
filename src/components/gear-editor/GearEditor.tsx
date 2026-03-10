@@ -1,8 +1,9 @@
 import { useState, useMemo } from 'react';
 import type { GearItem } from '../../logic/types';
-import { CATEGORY_ORDER } from '../../logic/types';
+import { CATEGORY_ORDER, CONDITION_FIELDS } from '../../logic/types';
 import GearItemRow from './GearItemRow';
 import GearItemForm from './GearItemForm';
+import CategoryForm from './CategoryForm';
 import { useGear } from '../../context/GearContext';
 
 function generateId(): string {
@@ -63,11 +64,13 @@ function getCategoryNames(items: GearItem[], order: string[]): string[] {
 }
 
 export default function GearEditor() {
-  const { items, setItems, importFromFile, resetToDefault, isCustom } = useGear();
+  const { items, setItems, categoryFields, setCategoryFields, importFromFile, resetToDefault, isCustom } = useGear();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [filter, setFilter] = useState('');
   const [categoryOrder, setCategoryOrder] = useState<string[]>([...CATEGORY_ORDER]);
   const [warningDismissed, setWarningDismissed] = useState(false);
+  const [editingCategory, setEditingCategory] = useState<string | null>(null);
+  const [addingCategory, setAddingCategory] = useState(false);
 
   const filtered = items.filter(
     (item) =>
@@ -108,19 +111,38 @@ export default function GearEditor() {
     setSelectedId(newItem.id);
   };
 
-  const handleAddCategory = () => {
-    const name = prompt('New category name:');
-    if (!name?.trim()) return;
-    const trimmed = name.trim();
-    const newItem = createEmptyItem(trimmed);
+  const handleAddCategorySave = (name: string, fields: string[]) => {
+    const newItem = createEmptyItem(name);
     setItems([...items, newItem]);
-    setCategoryOrder((prev) => prev.includes(trimmed) ? prev : [...prev, trimmed]);
+    setCategoryOrder((prev) => prev.includes(name) ? prev : [...prev, name]);
+    setCategoryFields({ ...categoryFields, [name]: fields });
+    setAddingCategory(false);
+  };
+
+  const handleEditCategorySave = (name: string, fields: string[]) => {
+    const oldName = editingCategory!;
+    const updated = { ...categoryFields };
+    if (oldName !== name) {
+      delete updated[oldName];
+      setItems(items.map((i) => i.category === oldName ? { ...i, category: name } : i));
+      setCategoryOrder((prev) => prev.map((c) => c === oldName ? name : c));
+    }
+    updated[name] = fields;
+    setCategoryFields(updated);
+    setEditingCategory(null);
   };
 
   const handleDeleteCategory = (category: string) => {
     if (!confirm(`Delete "${category}" and all its items?`)) return;
     setItems(items.filter((i) => i.category !== category));
+    const updated = { ...categoryFields };
+    delete updated[category];
+    setCategoryFields(updated);
     setSelectedId(null);
+  };
+
+  const getFieldsForCategory = (category: string): string[] => {
+    return categoryFields[category] || CONDITION_FIELDS.map((cf) => cf.key);
   };
 
   return (
@@ -131,7 +153,7 @@ export default function GearEditor() {
           <button type="button" className="btn btn-primary" onClick={() => handleAdd()}>
             Add Item
           </button>
-          <button type="button" className="btn btn-primary" onClick={handleAddCategory}>
+          <button type="button" className="btn btn-primary" onClick={() => setAddingCategory(true)}>
             Add Category
           </button>
           <button type="button" className="btn btn-secondary" onClick={() => exportJson(items)}>
@@ -175,7 +197,7 @@ export default function GearEditor() {
           <div key={category} className="editor-category-card">
             <div className="editor-category-header">
               <h3 className="editor-category-title">{category}</h3>
-              <div style={{ display: 'flex', gap: '0.25rem' }}>
+              <div className="editor-category-buttons">
                 <button
                   type="button"
                   className="btn btn-small btn-secondary"
@@ -193,6 +215,14 @@ export default function GearEditor() {
                   title="Move right"
                 >
                   &#8594;
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-small btn-secondary"
+                  onClick={() => setEditingCategory(category)}
+                  title="Edit category settings"
+                >
+                  &#9881;
                 </button>
                 <button
                   type="button"
@@ -235,8 +265,36 @@ export default function GearEditor() {
               key={selectedItem.id}
               item={selectedItem}
               allItems={items}
+              categoryFields={getFieldsForCategory(selectedItem.category)}
               onSave={handleSave}
               onCancel={() => setSelectedId(null)}
+            />
+          </div>
+        </div>
+      )}
+
+      {addingCategory && (
+        <div className="editor-form-overlay" onClick={() => setAddingCategory(false)}>
+          <div className="editor-form-panel" onClick={(e) => e.stopPropagation()}>
+            <CategoryForm
+              name=""
+              selectedFields={[]}
+              onSave={handleAddCategorySave}
+              onCancel={() => setAddingCategory(false)}
+              isNew
+            />
+          </div>
+        </div>
+      )}
+
+      {editingCategory && (
+        <div className="editor-form-overlay" onClick={() => setEditingCategory(null)}>
+          <div className="editor-form-panel" onClick={(e) => e.stopPropagation()}>
+            <CategoryForm
+              name={editingCategory}
+              selectedFields={getFieldsForCategory(editingCategory)}
+              onSave={handleEditCategorySave}
+              onCancel={() => setEditingCategory(null)}
             />
           </div>
         </div>

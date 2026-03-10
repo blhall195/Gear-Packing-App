@@ -463,6 +463,11 @@ body {
   color: var(--color-primary);
 }
 
+.editor-category-buttons {
+  display: flex;
+  gap: 0.25rem;
+}
+
 .editor-category-items {
   display: flex;
   flex-direction: column;

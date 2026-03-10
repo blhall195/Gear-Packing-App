@@ -14,9 +14,10 @@ A trip packing checklist generator built with React + TypeScript + Vite. Users a
 src/
   assets/gear-data.json        -- All gear items and their conditions (source of truth)
   logic/
-    types.ts                   -- GearItem, TripAnswers interfaces, CONDITION_FIELDS, CATEGORY_ORDER
+    types.ts                   -- GearItem, TripAnswers interfaces, CONDITION_FIELDS, CATEGORY_ORDER, DEFAULT_CATEGORY_FIELDS
     matching.ts                -- matchGear() algorithm, extractOptions() helper
   context/TripContext.tsx       -- Shared trip answers state
+  context/GearContext.tsx       -- Gear items + category field mappings, persisted to localStorage
   components/
     App.tsx                    -- HashRouter + routes (/, /list, /editor)
     Layout.tsx                 -- Nav bar + Outlet, wide layout for /list and /editor
@@ -32,6 +33,7 @@ src/
       GearEditor.tsx            -- Category cards in 4-col grid, modal edit form, JSON export
       GearItemRow.tsx           -- Item row with delete button
       GearItemForm.tsx          -- Edit form with condition checkboxes + "add new value" inputs
+      CategoryForm.tsx          -- Modal form for creating/editing category field mappings
   styles/global.css             -- All styles in one file
 ```
 
@@ -57,11 +59,18 @@ Options are derived from gear data (Option B) - adding a new value to any item m
 - `single_day` skips: location, shelter, sleepProvision, cooking
 - `shelter === 'hotel'` auto-sets sleepProvision to 'full_bedding'
 
+## Category Field Mappings
+- Each category has a configurable set of condition fields (which questions apply to its items)
+- Stored in localStorage (`custom-category-fields`) alongside gear data
+- DEFAULT_CATEGORY_FIELDS in types.ts provides defaults for built-in categories
+- Categories not in the mapping show all condition fields as fallback
+- Users can set fields when creating a category and edit them later via the gear icon button
+
 ## Gear Editor Workflow
 Edit items visually -> Export JSON -> Replace src/assets/gear-data.json in repo -> Push to main -> Auto-deploys
 
 ## Vite Config
-- base: '/Packing-App-Website/' (must match GitHub repo name)
+- base: '/' (custom domain mygearlist.co.uk, no path prefix needed)
 
 ## Key Conventions
 - Type-only imports required (verbatimModuleSyntax): `import type { Foo }` for types

@@ -40,7 +40,7 @@ export const CONDITION_FIELDS = [
   { key: 'cooking' as const, multi: false, label: 'Cooking' },
 ];
 
-export const CATEGORY_FIELDS: Record<string, string[]> = {
+export const DEFAULT_CATEGORY_FIELDS: Record<string, string[]> = {
   'Essentials': ['activities', 'weather', 'duration'],
   'Clothing': ['activities', 'weather', 'duration'],
   'Safety': ['activities', 'weather'],

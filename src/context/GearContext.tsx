@@ -1,17 +1,21 @@
 import { createContext, useContext, useState, useRef } from 'react';
 import type { ReactNode } from 'react';
 import type { GearItem } from '../logic/types';
+import { DEFAULT_CATEGORY_FIELDS } from '../logic/types';
 import defaultGearData from '../assets/gear-data.json';
 
 interface GearContextType {
   items: GearItem[];
   setItems: (items: GearItem[]) => void;
+  categoryFields: Record<string, string[]>;
+  setCategoryFields: (fields: Record<string, string[]>) => void;
   importFromFile: () => void;
   resetToDefault: () => void;
   isCustom: boolean;
 }
 
 const STORAGE_KEY = 'custom-gear-data';
+const FIELDS_STORAGE_KEY = 'custom-category-fields';
 
 function loadGear(): { items: GearItem[]; isCustom: boolean } {
   try {
@@ -23,12 +27,23 @@ function loadGear(): { items: GearItem[]; isCustom: boolean } {
   return { items: defaultGearData as GearItem[], isCustom: false };
 }
 
+function loadCategoryFields(): Record<string, string[]> {
+  try {
+    const stored = localStorage.getItem(FIELDS_STORAGE_KEY);
+    if (stored) {
+      return JSON.parse(stored) as Record<string, string[]>;
+    }
+  } catch { /* ignore */ }
+  return { ...DEFAULT_CATEGORY_FIELDS };
+}
+
 const GearContext = createContext<GearContextType | null>(null);
 
 export function GearProvider({ children }: { children: ReactNode }) {
   const initial = loadGear();
   const [items, setItemsState] = useState<GearItem[]>(initial.items);
   const [isCustom, setIsCustom] = useState(initial.isCustom);
+  const [categoryFields, setCategoryFieldsState] = useState<Record<string, string[]>>(loadCategoryFields);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const setItems = (newItems: GearItem[]) => {
@@ -37,9 +52,17 @@ export function GearProvider({ children }: { children: ReactNode }) {
     setIsCustom(true);
   };
 
+  const setCategoryFields = (fields: Record<string, string[]>) => {
+    setCategoryFieldsState(fields);
+    localStorage.setItem(FIELDS_STORAGE_KEY, JSON.stringify(fields));
+    setIsCustom(true);
+  };
+
   const resetToDefault = () => {
     setItemsState(defaultGearData as GearItem[]);
+    setCategoryFieldsState({ ...DEFAULT_CATEGORY_FIELDS });
     localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(FIELDS_STORAGE_KEY);
     setIsCustom(false);
   };
 
@@ -85,7 +108,7 @@ export function GearProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <GearContext.Provider value={{ items, setItems, importFromFile, resetToDefault, isCustom }}>
+    <GearContext.Provider value={{ items, setItems, categoryFields, setCategoryFields, importFromFile, resetToDefault, isCustom }}>
       {children}
     </GearContext.Provider>
   );

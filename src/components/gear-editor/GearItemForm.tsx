@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import type { GearItem } from '../../logic/types';
-import { CONDITION_FIELDS, CATEGORY_FIELDS } from '../../logic/types';
+import { CONDITION_FIELDS } from '../../logic/types';
 
 interface Props {
   item: GearItem;
   allItems: GearItem[];
+  categoryFields: string[];
   onSave: (item: GearItem) => void;
   onCancel: () => void;
 }
@@ -25,7 +26,7 @@ function getCategories(allItems: GearItem[]): string[] {
   return Array.from(cats).sort();
 }
 
-export default function GearItemForm({ item, allItems, onSave, onCancel }: Props) {
+export default function GearItemForm({ item, allItems, categoryFields, onSave, onCancel }: Props) {
   const [draft, setDraft] = useState<GearItem>({ ...item });
   const [newValues, setNewValues] = useState<Record<string, string>>({});
 
@@ -99,8 +100,7 @@ export default function GearItemForm({ item, allItems, onSave, onCancel }: Props
       </div>
 
       {!draft.always && CONDITION_FIELDS.filter((cf) => {
-        const allowed = CATEGORY_FIELDS[draft.category];
-        return !allowed || allowed.includes(cf.key);
+        return categoryFields.includes(cf.key);
       }).map((cf) => {
         const options = getOptionsForField(allItems, cf.key);
         const selected = (draft as Record<string, unknown>)[cf.key] as string[];
