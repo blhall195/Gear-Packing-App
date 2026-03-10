@@ -24,7 +24,7 @@ function loadGear(): { items: GearItem[]; isCustom: boolean } {
       return { items: JSON.parse(stored) as GearItem[], isCustom: true };
     }
   } catch { /* ignore */ }
-  return { items: defaultGearData as GearItem[], isCustom: false };
+  return { items: defaultGearData as unknown as GearItem[], isCustom: false };
 }
 
 function migrateCategoryFields(raw: Record<string, unknown>): Record<string, CategoryFieldConfig> {
@@ -77,7 +77,7 @@ export function GearProvider({ children }: { children: ReactNode }) {
   };
 
   const resetToDefault = () => {
-    setItemsState(defaultGearData as GearItem[]);
+    setItemsState(defaultGearData as unknown as GearItem[]);
     setCategoryFieldsState({ ...DEFAULT_CATEGORY_FIELDS });
     localStorage.removeItem(STORAGE_KEY);
     localStorage.removeItem(FIELDS_STORAGE_KEY);

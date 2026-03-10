@@ -88,7 +88,7 @@ export default function QuestionForm({ question, allQuestions, onSave, onCancel 
     }
     const condition: ShowWhenCondition = { field };
     if (key && value) {
-      (condition as Record<string, string>)[key] = value;
+      (condition as unknown as Record<string, string>)[key] = value;
     }
     setDraft({ ...draft, showWhen: condition });
   };
