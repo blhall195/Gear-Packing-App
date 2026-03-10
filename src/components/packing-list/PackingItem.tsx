@@ -1,18 +1,23 @@
-import { useState } from 'react';
-
 interface Props {
   name: string;
+  optional?: boolean;
+  checked: boolean;
+  onChange: () => void;
 }
 
-export default function PackingItem({ name }: Props) {
-  const [checked, setChecked] = useState(false);
+export default function PackingItem({ name, optional, checked, onChange }: Props) {
+  const className = [
+    'packing-item',
+    checked ? 'checked' : '',
+    optional ? 'optional' : '',
+  ].filter(Boolean).join(' ');
 
   return (
-    <label className={`packing-item ${checked ? 'checked' : ''}`}>
+    <label className={className}>
       <input
         type="checkbox"
         checked={checked}
-        onChange={() => setChecked(!checked)}
+        onChange={onChange}
       />
       <span className="item-name">{name}</span>
     </label>

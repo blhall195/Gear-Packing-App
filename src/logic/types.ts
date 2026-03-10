@@ -4,6 +4,7 @@ export interface GearItem {
   name: string;
   category: string;
   always: boolean;
+  optional: boolean;
   activities: string[];
   climbingType: string[];
   cavingType: string[];
@@ -40,18 +41,20 @@ export const CONDITION_FIELDS = [
   { key: 'cooking' as const, multi: false, label: 'Cooking' },
 ];
 
-export const DEFAULT_CATEGORY_FIELDS: Record<string, string[]> = {
-  'Essentials': ['activities', 'weather', 'duration'],
-  'Clothing': ['activities', 'weather', 'duration'],
-  'Safety': ['activities', 'weather'],
-  'Climbing Gear': ['activities', 'climbingType'],
-  'Caving Gear': ['activities', 'cavingType'],
-  'Camping Gear': ['duration', 'shelter'],
-  'Navigation': ['activities'],
-  'Sleep System': ['duration', 'shelter', 'sleepProvision'],
-  'Cooking': ['cooking', 'duration'],
-  'Electronics': ['duration', 'shelter'],
-  'Travel Documents': ['location'],
+export type CategoryFieldConfig = Record<string, string[]>;
+
+export const DEFAULT_CATEGORY_FIELDS: Record<string, CategoryFieldConfig> = {
+  'Essentials': { activities: [], weather: [], duration: [] },
+  'Clothing': { activities: [], weather: [], duration: [] },
+  'Safety': { activities: [], weather: [] },
+  'Climbing Gear': { activities: [], climbingType: [] },
+  'Caving Gear': { activities: [], cavingType: [] },
+  'Camping Gear': { duration: [], shelter: [] },
+  'Navigation': { activities: [] },
+  'Sleep System': { duration: [], shelter: [], sleepProvision: [] },
+  'Cooking': { cooking: [], duration: [] },
+  'Electronics': { duration: [], shelter: [] },
+  'Travel Documents': { location: [] },
 };
 
 export const CATEGORY_ORDER = [
@@ -67,3 +70,36 @@ export const CATEGORY_ORDER = [
   'Electronics',
   'Travel Documents',
 ];
+
+/* ── Question Editor types ── */
+
+export interface ShowWhenCondition {
+  field: string;
+  includes?: string;
+  equals?: string;
+  notIncludes?: string;
+  notEquals?: string;
+}
+
+export interface AutoValueCondition {
+  field: string;
+  equals: string;
+  setValue: string;
+}
+
+export interface BaseOption {
+  value: string;
+  label: string;
+}
+
+export interface QuestionConfig {
+  id: string;
+  field: string;
+  label: string;
+  selectMode: 'single' | 'multi';
+  baseOptions: BaseOption[];
+  parentId: string | null;
+  order: number;
+  showWhen?: ShowWhenCondition;
+  autoWhen?: AutoValueCondition;
+}

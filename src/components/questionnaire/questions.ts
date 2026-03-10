@@ -1,4 +1,5 @@
 import type { TripAnswers } from '../../logic/types';
+import type { QuestionConfig, ShowWhenCondition, AutoValueCondition } from '../../logic/types';
 
 export interface QuestionDef {
   field: keyof TripAnswers;
@@ -9,80 +10,98 @@ export interface QuestionDef {
   autoValue?: (answers: Partial<TripAnswers>) => string | null;
 }
 
-export function buildQuestions(availableOptions: Record<string, string[]>): QuestionDef[] {
-  const toOpts = (values: string[]) =>
-    values.map((v) => ({ value: v, label: v.replace(/_/g, ' ') }));
+function evaluateShowWhen(condition: ShowWhenCondition): (answers: Partial<TripAnswers>) => boolean {
+  return (answers) => {
+    const val = answers[condition.field];
 
-  const mergeOpts = (base: string[], extra: string[]) => {
-    const all = [...new Set([...base, ...extra])];
-    return toOpts(all);
+    // If the referenced field hasn't been answered yet, hide the question
+    if (val === undefined || val === null) return true;
+
+    if (condition.includes !== undefined) {
+      if (Array.isArray(val)) {
+        return !(val as string[]).includes(condition.includes);
+      }
+      return val !== condition.includes;
+    }
+
+    if (condition.equals !== undefined) {
+      if (Array.isArray(val)) {
+        return !(val as string[]).includes(condition.equals);
+      }
+      return val !== condition.equals;
+    }
+
+    if (condition.notIncludes !== undefined) {
+      if (Array.isArray(val)) {
+        return (val as string[]).includes(condition.notIncludes);
+      }
+      return val === condition.notIncludes;
+    }
+
+    if (condition.notEquals !== undefined) {
+      if (Array.isArray(val)) {
+        return (val as string[]).includes(condition.notEquals);
+      }
+      return val === condition.notEquals;
+    }
+
+    return false;
   };
+}
 
-  return [
-    {
-      field: 'activities',
-      label: 'What activities are you doing?',
-      selectMode: 'multi',
-      options: toOpts(availableOptions.activities || []),
-    },
-    {
-      field: 'climbingType',
-      label: 'What type of climbing?',
-      selectMode: 'multi',
-      options: mergeOpts(['trad', 'sport', 'bouldering', 'scrambling'], availableOptions.climbingType || []),
-      skip: (a) => !a.activities || !(a.activities as string[]).includes('climbing'),
-    },
-    {
-      field: 'cavingType',
-      label: 'What type of caving?',
-      selectMode: 'multi',
-      options: [
-        { value: 'srt_trip', label: 'SRT Trip' },
-        { value: 'non_srt_trip', label: 'Non-SRT Trip' },
-        ...toOpts((availableOptions.cavingType || []).filter(v => v !== 'srt_trip' && v !== 'non_srt_trip')),
-      ],
-      skip: (a) => !a.activities || !(a.activities as string[]).includes('caving'),
-    },
-    {
-      field: 'weather',
-      label: "What are the conditions like?",
-      selectMode: 'multi',
-      options: toOpts(availableOptions.weather || []),
-    },
-    {
-      field: 'duration',
-      label: 'How long is the trip?',
-      selectMode: 'single',
-      options: mergeOpts(['single_day', 'multi_day'], availableOptions.duration || []),
-    },
-    {
-      field: 'location',
-      label: 'Home or abroad?',
-      selectMode: 'single',
-      options: mergeOpts(['home', 'abroad'], availableOptions.location || []),
-      skip: (a) => a.duration === 'single_day',
-    },
-    {
-      field: 'shelter',
-      label: 'Where are you sleeping?',
-      selectMode: 'single',
-      options: toOpts(availableOptions.shelter || []),
-      skip: (a) => a.duration === 'single_day',
-    },
-    {
-      field: 'sleepProvision',
-      label: 'What sleep provision is there?',
-      selectMode: 'single',
-      options: toOpts(availableOptions.sleepProvision || []),
-      skip: (a) => a.duration === 'single_day',
-      autoValue: (a) => (a.shelter === 'hotel' ? 'full_bedding' : null),
-    },
-    {
-      field: 'cooking',
-      label: 'Cooking situation?',
-      selectMode: 'single',
-      options: toOpts(availableOptions.cooking || []),
-      skip: (a) => a.duration === 'single_day',
-    },
-  ];
+function evaluateAutoWhen(condition: AutoValueCondition): (answers: Partial<TripAnswers>) => string | null {
+  return (answers) => {
+    const val = answers[condition.field];
+    if (val === condition.equals) return condition.setValue;
+    if (Array.isArray(val) && (val as string[]).includes(condition.equals)) return condition.setValue;
+    return null;
+  };
+}
+
+export function buildQuestions(
+  configs: QuestionConfig[],
+): QuestionDef[] {
+  // Sort: top-level by order, then children after their parent by order
+  const sorted = flattenTree(configs);
+
+  return sorted.map((config) => {
+    const def: QuestionDef = {
+      field: config.field as keyof TripAnswers,
+      label: config.label,
+      selectMode: config.selectMode,
+      options: config.baseOptions,
+    };
+
+    if (config.showWhen) {
+      def.skip = evaluateShowWhen(config.showWhen);
+    }
+
+    if (config.autoWhen) {
+      def.autoValue = evaluateAutoWhen(config.autoWhen);
+    }
+
+    return def;
+  });
+}
+
+/** Flatten question tree: top-level sorted by order, children inserted after parent */
+function flattenTree(configs: QuestionConfig[]): QuestionConfig[] {
+  const roots = configs.filter((c) => !c.parentId).sort((a, b) => a.order - b.order);
+  const result: QuestionConfig[] = [];
+
+  function addWithChildren(node: QuestionConfig) {
+    result.push(node);
+    const children = configs
+      .filter((c) => c.parentId === node.id)
+      .sort((a, b) => a.order - b.order);
+    for (const child of children) {
+      addWithChildren(child);
+    }
+  }
+
+  for (const root of roots) {
+    addWithChildren(root);
+  }
+
+  return result;
 }

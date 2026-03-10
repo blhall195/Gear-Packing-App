@@ -1,14 +1,14 @@
 import { createContext, useContext, useState, useRef } from 'react';
 import type { ReactNode } from 'react';
-import type { GearItem } from '../logic/types';
+import type { GearItem, CategoryFieldConfig } from '../logic/types';
 import { DEFAULT_CATEGORY_FIELDS } from '../logic/types';
 import defaultGearData from '../assets/gear-data.json';
 
 interface GearContextType {
   items: GearItem[];
   setItems: (items: GearItem[]) => void;
-  categoryFields: Record<string, string[]>;
-  setCategoryFields: (fields: Record<string, string[]>) => void;
+  categoryFields: Record<string, CategoryFieldConfig>;
+  setCategoryFields: (fields: Record<string, CategoryFieldConfig>) => void;
   importFromFile: () => void;
   resetToDefault: () => void;
   isCustom: boolean;
@@ -27,11 +27,29 @@ function loadGear(): { items: GearItem[]; isCustom: boolean } {
   return { items: defaultGearData as GearItem[], isCustom: false };
 }
 
-function loadCategoryFields(): Record<string, string[]> {
+function migrateCategoryFields(raw: Record<string, unknown>): Record<string, CategoryFieldConfig> {
+  const result: Record<string, CategoryFieldConfig> = {};
+  for (const [cat, value] of Object.entries(raw)) {
+    if (Array.isArray(value)) {
+      // Old format: string[] of field names → convert to Record with empty defaults
+      const config: CategoryFieldConfig = {};
+      for (const field of value as string[]) {
+        config[field] = [];
+      }
+      result[cat] = config;
+    } else if (value && typeof value === 'object') {
+      result[cat] = value as CategoryFieldConfig;
+    }
+  }
+  return result;
+}
+
+function loadCategoryFields(): Record<string, CategoryFieldConfig> {
   try {
     const stored = localStorage.getItem(FIELDS_STORAGE_KEY);
     if (stored) {
-      return JSON.parse(stored) as Record<string, string[]>;
+      const parsed = JSON.parse(stored) as Record<string, unknown>;
+      return migrateCategoryFields(parsed);
     }
   } catch { /* ignore */ }
   return { ...DEFAULT_CATEGORY_FIELDS };
@@ -43,7 +61,7 @@ export function GearProvider({ children }: { children: ReactNode }) {
   const initial = loadGear();
   const [items, setItemsState] = useState<GearItem[]>(initial.items);
   const [isCustom, setIsCustom] = useState(initial.isCustom);
-  const [categoryFields, setCategoryFieldsState] = useState<Record<string, string[]>>(loadCategoryFields);
+  const [categoryFields, setCategoryFieldsState] = useState<Record<string, CategoryFieldConfig>>(loadCategoryFields);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const setItems = (newItems: GearItem[]) => {
@@ -52,7 +70,7 @@ export function GearProvider({ children }: { children: ReactNode }) {
     setIsCustom(true);
   };
 
-  const setCategoryFields = (fields: Record<string, string[]>) => {
+  const setCategoryFields = (fields: Record<string, CategoryFieldConfig>) => {
     setCategoryFieldsState(fields);
     localStorage.setItem(FIELDS_STORAGE_KEY, JSON.stringify(fields));
     setIsCustom(true);

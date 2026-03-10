@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import type { GearItem } from '../../logic/types';
+import type { QuestionConfig } from '../../logic/types';
 import { CONDITION_FIELDS } from '../../logic/types';
+import { useQuestions } from '../../context/QuestionContext';
 
 interface Props {
   item: GearItem;
@@ -10,12 +12,19 @@ interface Props {
   onCancel: () => void;
 }
 
-function getOptionsForField(allItems: GearItem[], field: string): string[] {
+function getOptionsForField(allItems: GearItem[], field: string, questions: QuestionConfig[]): string[] {
   const values = new Set<string>();
   for (const item of allItems) {
     const arr = (item as Record<string, unknown>)[field];
     if (Array.isArray(arr)) {
       arr.forEach((v: string) => values.add(v));
+    }
+  }
+  // Also include options from question config so newly added options appear
+  const questionConfig = questions.find((q) => q.field === field);
+  if (questionConfig) {
+    for (const opt of questionConfig.baseOptions) {
+      values.add(opt.value);
     }
   }
   return Array.from(values).sort();
@@ -27,7 +36,8 @@ function getCategories(allItems: GearItem[]): string[] {
 }
 
 export default function GearItemForm({ item, allItems, categoryFields, onSave, onCancel }: Props) {
-  const [draft, setDraft] = useState<GearItem>({ ...item });
+  const { questions } = useQuestions();
+  const [draft, setDraft] = useState<GearItem>({ ...item, optional: item.optional ?? false });
   const [newValues, setNewValues] = useState<Record<string, string>>({});
 
   const categories = getCategories(allItems);
@@ -99,10 +109,21 @@ export default function GearItemForm({ item, allItems, categoryFields, onSave, o
         </label>
       </div>
 
+      <div className="form-field">
+        <label className="checkbox-label">
+          <input
+            type="checkbox"
+            checked={draft.optional}
+            onChange={(e) => setDraft({ ...draft, optional: e.target.checked })}
+          />
+          Optional item (shown greyed out on packing list)
+        </label>
+      </div>
+
       {!draft.always && CONDITION_FIELDS.filter((cf) => {
         return categoryFields.includes(cf.key);
       }).map((cf) => {
-        const options = getOptionsForField(allItems, cf.key);
+        const options = getOptionsForField(allItems, cf.key, questions);
         const selected = (draft as Record<string, unknown>)[cf.key] as string[];
 
         return (

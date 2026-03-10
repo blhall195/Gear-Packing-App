@@ -14,6 +14,7 @@ export default function GearItemRow({ item, isSelected, onClick, onDelete }: Pro
         <span className="gear-item-name">{item.name}</span>
         <span className="gear-item-category">{item.category}</span>
         {item.always && <span className="gear-item-badge">Always</span>}
+        {item.optional && <span className="gear-item-badge optional-badge">Optional</span>}
       </div>
       <button
         type="button"

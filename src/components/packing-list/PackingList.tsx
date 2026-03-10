@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { useTrip } from '../../context/TripContext';
 import { useGear } from '../../context/GearContext';
@@ -7,9 +7,34 @@ import type { GearItem } from '../../logic/types';
 import { CATEGORY_ORDER } from '../../logic/types';
 import CategoryGroup from './CategoryGroup';
 
+const CHECKED_STORAGE_KEY = 'checked-items';
+
+function loadChecked(): Set<string> {
+  try {
+    const stored = localStorage.getItem(CHECKED_STORAGE_KEY);
+    if (stored) return new Set(JSON.parse(stored) as string[]);
+  } catch { /* ignore */ }
+  return new Set();
+}
+
+function saveChecked(ids: Set<string>) {
+  localStorage.setItem(CHECKED_STORAGE_KEY, JSON.stringify([...ids]));
+}
+
 export default function PackingList() {
   const { answers } = useTrip();
   const { items } = useGear();
+  const [checkedIds, setCheckedIds] = useState<Set<string>>(loadChecked);
+
+  const handleToggle = useCallback((id: string) => {
+    setCheckedIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      saveChecked(next);
+      return next;
+    });
+  }, []);
 
   const matched = useMemo(() => matchGear(items, answers), [items, answers]);
 
@@ -52,7 +77,7 @@ export default function PackingList() {
 
       <div className="list-content">
         {grouped.map(([category, categoryItems]) => (
-          <CategoryGroup key={category} category={category} items={categoryItems} />
+          <CategoryGroup key={category} category={category} items={categoryItems} checkedIds={checkedIds} onToggle={handleToggle} />
         ))}
       </div>
 

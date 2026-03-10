@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import type { GearItem } from '../../logic/types';
+import type { GearItem, CategoryFieldConfig } from '../../logic/types';
 import { CATEGORY_ORDER, CONDITION_FIELDS } from '../../logic/types';
 import GearItemRow from './GearItemRow';
 import GearItemForm from './GearItemForm';
@@ -13,21 +13,22 @@ function generateId(): string {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 10);
 }
 
-function createEmptyItem(category?: string): GearItem {
+function createEmptyItem(category?: string, defaults?: CategoryFieldConfig): GearItem {
   return {
     id: generateId(),
     name: '',
     category: category || '',
     always: false,
-    activities: [],
-    climbingType: [],
-    cavingType: [],
-    weather: [],
-    duration: [],
-    shelter: [],
-    sleepProvision: [],
-    location: [],
-    cooking: [],
+    optional: false,
+    activities: defaults?.activities ? [...defaults.activities] : [],
+    climbingType: defaults?.climbingType ? [...defaults.climbingType] : [],
+    cavingType: defaults?.cavingType ? [...defaults.cavingType] : [],
+    weather: defaults?.weather ? [...defaults.weather] : [],
+    duration: defaults?.duration ? [...defaults.duration] : [],
+    shelter: defaults?.shelter ? [...defaults.shelter] : [],
+    sleepProvision: defaults?.sleepProvision ? [...defaults.sleepProvision] : [],
+    location: defaults?.location ? [...defaults.location] : [],
+    cooking: defaults?.cooking ? [...defaults.cooking] : [],
   };
 }
 
@@ -72,6 +73,8 @@ export default function GearEditor() {
   const [editingCategory, setEditingCategory] = useState<string | null>(null);
   const [addingCategory, setAddingCategory] = useState(false);
 
+  const isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+
   const filtered = items.filter(
     (item) =>
       item.name.toLowerCase().includes(filter.toLowerCase()) ||
@@ -106,20 +109,21 @@ export default function GearEditor() {
   };
 
   const handleAdd = (category?: string) => {
-    const newItem = createEmptyItem(category);
+    const defaults = category ? categoryFields[category] : undefined;
+    const newItem = createEmptyItem(category, defaults);
     setItems([...items, newItem]);
     setSelectedId(newItem.id);
   };
 
-  const handleAddCategorySave = (name: string, fields: string[]) => {
-    const newItem = createEmptyItem(name);
+  const handleAddCategorySave = (name: string, config: CategoryFieldConfig) => {
+    const newItem = createEmptyItem(name, config);
     setItems([...items, newItem]);
     setCategoryOrder((prev) => prev.includes(name) ? prev : [...prev, name]);
-    setCategoryFields({ ...categoryFields, [name]: fields });
+    setCategoryFields({ ...categoryFields, [name]: config });
     setAddingCategory(false);
   };
 
-  const handleEditCategorySave = (name: string, fields: string[]) => {
+  const handleEditCategorySave = (name: string, config: CategoryFieldConfig) => {
     const oldName = editingCategory!;
     const updated = { ...categoryFields };
     if (oldName !== name) {
@@ -127,7 +131,7 @@ export default function GearEditor() {
       setItems(items.map((i) => i.category === oldName ? { ...i, category: name } : i));
       setCategoryOrder((prev) => prev.map((c) => c === oldName ? name : c));
     }
-    updated[name] = fields;
+    updated[name] = config;
     setCategoryFields(updated);
     setEditingCategory(null);
   };
@@ -142,7 +146,8 @@ export default function GearEditor() {
   };
 
   const getFieldsForCategory = (category: string): string[] => {
-    return categoryFields[category] || CONDITION_FIELDS.map((cf) => cf.key);
+    const config = categoryFields[category];
+    return config ? Object.keys(config) : CONDITION_FIELDS.map((cf) => cf.key);
   };
 
   return (
@@ -170,7 +175,7 @@ export default function GearEditor() {
         </div>
       </div>
 
-      {isCustom && !warningDismissed && (
+      {isCustom && !isLocal && !warningDismissed && (
         <p className="gear-warning">
           You are using a custom gear setup. These settings are stored in your browser and will be lost if you clear your browser data. Use "Download Gear Settings" to save a backup.
           <button
@@ -278,7 +283,8 @@ export default function GearEditor() {
           <div className="editor-form-panel" onClick={(e) => e.stopPropagation()}>
             <CategoryForm
               name=""
-              selectedFields={[]}
+              fieldConfig={{}}
+              allItems={items}
               onSave={handleAddCategorySave}
               onCancel={() => setAddingCategory(false)}
               isNew
@@ -292,7 +298,8 @@ export default function GearEditor() {
           <div className="editor-form-panel" onClick={(e) => e.stopPropagation()}>
             <CategoryForm
               name={editingCategory}
-              selectedFields={getFieldsForCategory(editingCategory)}
+              fieldConfig={categoryFields[editingCategory] || {}}
+              allItems={items}
               onSave={handleEditCategorySave}
               onCancel={() => setEditingCategory(null)}
             />
