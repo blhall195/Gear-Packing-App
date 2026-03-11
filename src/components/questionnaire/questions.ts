@@ -2,6 +2,8 @@ import type { TripAnswers } from '../../logic/types';
 import type { QuestionConfig, ShowWhenCondition, AutoValueCondition } from '../../logic/types';
 
 export interface QuestionDef {
+  id: string;
+  parentId: string | null;
   field: keyof TripAnswers;
   label: string;
   selectMode: 'single' | 'multi';
@@ -66,6 +68,8 @@ export function buildQuestions(
 
   return sorted.map((config) => {
     const def: QuestionDef = {
+      id: config.id,
+      parentId: config.parentId,
       field: config.field as keyof TripAnswers,
       label: config.label,
       selectMode: config.selectMode,

@@ -113,6 +113,7 @@ export default function QuestionForm({ question, allQuestions, onSave, onCancel 
 
   return (
     <form className="gear-item-form" onSubmit={handleSubmit}>
+      <button type="button" className="form-close-btn" onClick={onCancel} aria-label="Close">&times;</button>
       <h3 style={{ marginBottom: '0.5rem' }}>
         {question.label ? 'Edit Question' : 'New Question'}
       </h3>

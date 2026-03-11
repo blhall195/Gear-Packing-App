@@ -4,6 +4,7 @@ import { useTrip } from '../../context/TripContext';
 import { useQuestions } from '../../context/QuestionContext';
 import type { TripAnswers } from '../../logic/types';
 import { CONDITION_FIELDS } from '../../logic/types';
+import type { QuestionDef } from './questions';
 import { buildQuestions } from './questions';
 import QuestionStep from './QuestionStep';
 
@@ -36,12 +37,24 @@ function loadStep(): number {
   return 0;
 }
 
+/** Get all descendants of a question (children, grandchildren, etc.) */
+function getDescendants(parentId: string, allQuestions: QuestionDef[]): QuestionDef[] {
+  const children = allQuestions.filter((q) => q.parentId === parentId);
+  const result: QuestionDef[] = [];
+  for (const child of children) {
+    result.push(child);
+    result.push(...getDescendants(child.id, allQuestions));
+  }
+  return result;
+}
+
 export default function Questionnaire() {
   const navigate = useNavigate();
   const { setAnswers, resetAnswers } = useTrip();
   const { questions: questionConfigs } = useQuestions();
   const [currentStep, setCurrentStepState] = useState(loadStep);
   const [draft, setDraftState] = useState<Partial<TripAnswers>>(loadDraft);
+  const [slideDir, setSlideDir] = useState<'forward' | 'back'>('forward');
 
   const setCurrentStep = useCallback((step: number) => {
     setCurrentStepState(step);
@@ -61,24 +74,52 @@ export default function Questionnaire() {
     [questionConfigs],
   );
 
-  const visibleQuestions = useMemo(() => {
-    return questions.filter((q) => !q.skip?.(draft));
+  // Root questions (no parent) that aren't skipped
+  const rootQuestions = useMemo(() => {
+    return questions.filter((q) => q.parentId === null && !q.skip?.(draft));
   }, [questions, draft]);
 
-  // Clamp step in case saved step exceeds visible questions (e.g. questions changed)
-  const clampedStep = Math.min(currentStep, Math.max(visibleQuestions.length - 1, 0));
+  // Clamp step
+  const clampedStep = Math.min(currentStep, Math.max(rootQuestions.length - 1, 0));
   if (clampedStep !== currentStep) {
     setCurrentStep(clampedStep);
   }
 
-  const currentQuestion = visibleQuestions[clampedStep];
+  const currentRoot = rootQuestions[clampedStep];
 
-  const handleChange = (value: string | string[]) => {
-    setDraft((prev) => ({ ...prev, [currentQuestion.field]: value }));
+  // Build the visible questions for the current panel (root + visible descendants)
+  const panelQuestions = useMemo(() => {
+    if (!currentRoot) return [];
+    const descendants = getDescendants(currentRoot.id, questions);
+    const visible = descendants.filter((q) => !q.skip?.(draft));
+    return [currentRoot, ...visible];
+  }, [currentRoot, questions, draft]);
+
+  const handleChange = (field: keyof TripAnswers, value: string | string[]) => {
+    setDraft((prev) => {
+      const next = { ...prev, [field]: value };
+
+      // Clear answers for child questions that become hidden after this change
+      if (currentRoot) {
+        const allDescendants = getDescendants(currentRoot.id, questions);
+        for (const desc of allDescendants) {
+          if (desc.skip?.(next)) {
+            if (desc.selectMode === 'multi') {
+              (next as Record<string, unknown>)[desc.field] = [];
+            } else {
+              (next as Record<string, unknown>)[desc.field] = null;
+            }
+          }
+        }
+      }
+
+      return next;
+    });
   };
 
   const handleNext = () => {
-    if (clampedStep < visibleQuestions.length - 1) {
+    if (clampedStep < rootQuestions.length - 1) {
+      setSlideDir('forward');
       setCurrentStep(clampedStep + 1);
     } else {
       const finalAnswers: TripAnswers = {
@@ -120,6 +161,7 @@ export default function Questionnaire() {
 
   const handleBack = () => {
     if (clampedStep > 0) {
+      setSlideDir('back');
       setCurrentStep(clampedStep - 1);
     }
   };
@@ -137,7 +179,7 @@ export default function Questionnaire() {
     localStorage.removeItem('checked-items');
   };
 
-  if (!currentQuestion) {
+  if (!currentRoot) {
     return (
       <div className="questionnaire">
         <p>No questions available.</p>
@@ -145,30 +187,45 @@ export default function Questionnaire() {
     );
   }
 
-  const isLast = clampedStep === visibleQuestions.length - 1;
-  const currentValue = draft[currentQuestion.field] ?? (currentQuestion.selectMode === 'multi' ? [] : null);
+  const isLast = clampedStep === rootQuestions.length - 1;
 
-  const canProceed = currentQuestion.selectMode === 'multi'
-    ? ((currentValue as string[]).length > 0)
-    : (currentValue !== null);
+  // Can proceed only if all visible panel questions are answered
+  const canProceed = panelQuestions.every((q) => {
+    const val = draft[q.field];
+    if (q.selectMode === 'multi') {
+      return ((val as string[]) || []).length > 0;
+    }
+    return val !== null && val !== undefined;
+  });
 
   return (
     <div className="questionnaire">
       <div className="progress-bar">
         <div
           className="progress-fill"
-          style={{ width: `${((clampedStep + 1) / visibleQuestions.length) * 100}%` }}
+          style={{ width: `${((clampedStep + 1) / rootQuestions.length) * 100}%` }}
         />
       </div>
       <p className="step-counter">
-        Question {clampedStep + 1} of {visibleQuestions.length}
+        Question {clampedStep + 1} of {rootQuestions.length}
       </p>
 
-      <QuestionStep
-        question={currentQuestion}
-        value={currentValue}
-        onChange={handleChange}
-      />
+      <div
+        key={clampedStep}
+        className={`question-panel slide-${slideDir}`}
+      >
+        {panelQuestions.map((q) => {
+          const val = draft[q.field] ?? (q.selectMode === 'multi' ? [] : null);
+          return (
+            <QuestionStep
+              key={q.field}
+              question={q}
+              value={val}
+              onChange={(value) => handleChange(q.field, value)}
+            />
+          );
+        })}
+      </div>
 
       <div className="question-nav">
         {clampedStep > 0 ? (

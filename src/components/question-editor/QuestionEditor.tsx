@@ -272,8 +272,8 @@ export default function QuestionEditor() {
       </div>
 
       {editingQuestion && (
-        <div className="editor-form-overlay" onClick={handleCancelEdit}>
-          <div className="editor-form-panel" onClick={(e) => e.stopPropagation()}>
+        <div className="editor-form-overlay">
+          <div className="editor-form-panel">
             <QuestionForm
               key={editingQuestion.id}
               question={editingQuestion}

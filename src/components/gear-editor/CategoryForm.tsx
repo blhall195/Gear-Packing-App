@@ -10,6 +10,7 @@ interface Props {
   allItems: GearItem[];
   onSave: (name: string, config: CategoryFieldConfig) => void;
   onCancel: () => void;
+  onDelete?: () => void;
   isNew?: boolean;
 }
 
@@ -30,7 +31,7 @@ function getOptionsForField(allItems: GearItem[], field: string, questions: Ques
   return Array.from(values).sort();
 }
 
-export default function CategoryForm({ name: initialName, fieldConfig, allItems, onSave, onCancel, isNew }: Props) {
+export default function CategoryForm({ name: initialName, fieldConfig, allItems, onSave, onCancel, onDelete, isNew }: Props) {
   const { questions } = useQuestions();
   const [name, setName] = useState(initialName);
   const [config, setConfig] = useState<CategoryFieldConfig>({ ...fieldConfig });
@@ -70,6 +71,7 @@ export default function CategoryForm({ name: initialName, fieldConfig, allItems,
 
   return (
     <form className="gear-item-form" onSubmit={handleSubmit}>
+      <button type="button" className="form-close-btn" onClick={onCancel} aria-label="Close">&times;</button>
       <div className="form-field">
         <label>{isNew ? 'Category Name' : 'Rename Category'}</label>
         <input
@@ -129,6 +131,11 @@ export default function CategoryForm({ name: initialName, fieldConfig, allItems,
       )}
 
       <div className="form-actions">
+        {onDelete && (
+          <button type="button" className="btn btn-danger" onClick={onDelete}>
+            Delete Category
+          </button>
+        )}
         <button type="button" className="btn btn-secondary" onClick={onCancel}>
           Cancel
         </button>

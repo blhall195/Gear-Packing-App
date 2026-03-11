@@ -1,4 +1,5 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef, useCallback } from 'react';
+import type { DragEvent } from 'react';
 import type { GearItem, CategoryFieldConfig } from '../../logic/types';
 import { CATEGORY_ORDER, CONDITION_FIELDS } from '../../logic/types';
 import GearItemRow from './GearItemRow';
@@ -68,10 +69,13 @@ export default function GearEditor() {
   const { items, setItems, categoryFields, setCategoryFields, importFromFile, resetToDefault, isCustom } = useGear();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [filter, setFilter] = useState('');
+  const [collapsedCategories, setCollapsedCategories] = useState<Set<string>>(new Set());
   const [categoryOrder, setCategoryOrder] = useState<string[]>([...CATEGORY_ORDER]);
   const [warningDismissed, setWarningDismissed] = useState(false);
   const [editingCategory, setEditingCategory] = useState<string | null>(null);
   const [addingCategory, setAddingCategory] = useState(false);
+  const [dragOverCategory, setDragOverCategory] = useState<string | null>(null);
+  const dragCategory = useRef<string | null>(null);
 
   const isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
 
@@ -83,17 +87,46 @@ export default function GearEditor() {
 
   const grouped = useMemo(() => groupByCategory(filtered, categoryOrder), [filtered, categoryOrder]);
 
-  const handleMoveCategory = (category: string, direction: -1 | 1) => {
-    setCategoryOrder((prev) => {
-      const allCats = getCategoryNames(items, prev);
-      const idx = allCats.indexOf(category);
-      const newIdx = idx + direction;
-      if (newIdx < 0 || newIdx >= allCats.length) return prev;
-      const reordered = [...allCats];
-      [reordered[idx], reordered[newIdx]] = [reordered[newIdx], reordered[idx]];
-      return reordered;
-    });
-  };
+  const handleEditorDragStart = useCallback((category: string) => {
+    dragCategory.current = category;
+  }, []);
+
+  const handleEditorDragOver = useCallback((category: string, e: DragEvent) => {
+    e.preventDefault();
+    if (dragCategory.current && dragCategory.current !== category) {
+      setDragOverCategory(category);
+    }
+  }, []);
+
+  const handleEditorDrop = useCallback((targetCategory: string, e: DragEvent) => {
+    e.preventDefault();
+    const source = dragCategory.current;
+    if (!source || source === targetCategory) {
+      setDragOverCategory(null);
+      return;
+    }
+
+    const currentCategories = grouped.map(([cat]) => cat);
+    const sourceIdx = currentCategories.indexOf(source);
+    const targetIdx = currentCategories.indexOf(targetCategory);
+    if (sourceIdx === -1 || targetIdx === -1) {
+      setDragOverCategory(null);
+      return;
+    }
+
+    const newOrder = [...currentCategories];
+    newOrder.splice(sourceIdx, 1);
+    newOrder.splice(targetIdx, 0, source);
+
+    setCategoryOrder(newOrder);
+    setDragOverCategory(null);
+    dragCategory.current = null;
+  }, [grouped]);
+
+  const handleEditorDragEnd = useCallback(() => {
+    dragCategory.current = null;
+    setDragOverCategory(null);
+  }, []);
 
   const selectedItem = items.find((i) => i.id === selectedId) || null;
 
@@ -143,6 +176,7 @@ export default function GearEditor() {
     delete updated[category];
     setCategoryFields(updated);
     setSelectedId(null);
+    setEditingCategory(null);
   };
 
   const getFieldsForCategory = (category: string): string[] => {
@@ -155,9 +189,6 @@ export default function GearEditor() {
       <div className="editor-header">
         <h2>Gear Editor</h2>
         <div className="editor-actions">
-          <button type="button" className="btn btn-primary" onClick={() => handleAdd()}>
-            Add Item
-          </button>
           <button type="button" className="btn btn-primary" onClick={() => setAddingCategory(true)}>
             Add Category
           </button>
@@ -198,54 +229,46 @@ export default function GearEditor() {
       />
 
       <div className="editor-categories">
-        {grouped.map(([category, categoryItems], idx) => (
-          <div key={category} className="editor-category-card">
+        {grouped.map(([category, categoryItems]) => (
+          <div
+            key={category}
+            className={`editor-category-card ${dragOverCategory === category ? 'drag-over' : ''} ${collapsedCategories.has(category) ? 'collapsed' : ''}`}
+            onDragOver={(e) => handleEditorDragOver(category, e)}
+            onDrop={(e) => handleEditorDrop(category, e)}
+          >
             <div className="editor-category-header">
-              <h3 className="editor-category-title">{category}</h3>
+              <h3
+                className="editor-category-title drag-handle"
+                draggable
+                onDragStart={() => handleEditorDragStart(category)}
+                onDragEnd={handleEditorDragEnd}
+                title="Drag to reorder"
+              >
+                <span className="drag-icon">&#9776;</span>
+                {category}
+              </h3>
               <div className="editor-category-buttons">
                 <button
                   type="button"
-                  className="btn btn-small btn-secondary"
-                  onClick={() => handleMoveCategory(category, -1)}
-                  disabled={idx === 0}
-                  title="Move left"
-                >
-                  &#8592;
-                </button>
-                <button
-                  type="button"
-                  className="btn btn-small btn-secondary"
-                  onClick={() => handleMoveCategory(category, 1)}
-                  disabled={idx === grouped.length - 1}
-                  title="Move right"
-                >
-                  &#8594;
-                </button>
-                <button
-                  type="button"
-                  className="btn btn-small btn-secondary"
+                  className="icon-btn"
                   onClick={() => setEditingCategory(category)}
                   title="Edit category settings"
                 >
-                  &#9881;
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" opacity="0.45"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 00.12-.61l-1.92-3.32a.49.49 0 00-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 00-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96a.49.49 0 00-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.07.62-.07.94s.02.64.07.94l-2.03 1.58a.49.49 0 00-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6A3.6 3.6 0 1112 8.4a3.6 3.6 0 010 7.2z"/></svg>
                 </button>
                 <button
                   type="button"
-                  className="btn btn-small btn-primary"
-                  onClick={() => handleAdd(category)}
-                >
-                  +
-                </button>
-                <button
-                  type="button"
-                  className="btn btn-small btn-danger"
-                  onClick={() => handleDeleteCategory(category)}
-                >
-                  &times;
-                </button>
+                  className="collapse-toggle"
+                  onClick={() => setCollapsedCategories(prev => {
+                    const next = new Set(prev);
+                    next.has(category) ? next.delete(category) : next.add(category);
+                    return next;
+                  })}
+                  aria-label={collapsedCategories.has(category) ? 'Expand' : 'Collapse'}
+                >{collapsedCategories.has(category) ? '\u25B2' : '\u25BC'}</button>
               </div>
             </div>
-            <div className="editor-category-items">
+            {!collapsedCategories.has(category) && <div className="editor-category-items">
               {categoryItems.map((item) => (
                 <GearItemRow
                   key={item.id}
@@ -255,7 +278,12 @@ export default function GearEditor() {
                   onDelete={() => handleDelete(item.id)}
                 />
               ))}
-            </div>
+              <button
+                type="button"
+                className="add-item-hint"
+                onClick={() => handleAdd(category)}
+              >+ Add new item...</button>
+            </div>}
           </div>
         ))}
         {grouped.length === 0 && (
@@ -264,8 +292,8 @@ export default function GearEditor() {
       </div>
 
       {selectedItem && (
-        <div className="editor-form-overlay" onClick={() => setSelectedId(null)}>
-          <div className="editor-form-panel" onClick={(e) => e.stopPropagation()}>
+        <div className="editor-form-overlay">
+          <div className="editor-form-panel">
             <GearItemForm
               key={selectedItem.id}
               item={selectedItem}
@@ -279,8 +307,8 @@ export default function GearEditor() {
       )}
 
       {addingCategory && (
-        <div className="editor-form-overlay" onClick={() => setAddingCategory(false)}>
-          <div className="editor-form-panel" onClick={(e) => e.stopPropagation()}>
+        <div className="editor-form-overlay">
+          <div className="editor-form-panel">
             <CategoryForm
               name=""
               fieldConfig={{}}
@@ -294,14 +322,15 @@ export default function GearEditor() {
       )}
 
       {editingCategory && (
-        <div className="editor-form-overlay" onClick={() => setEditingCategory(null)}>
-          <div className="editor-form-panel" onClick={(e) => e.stopPropagation()}>
+        <div className="editor-form-overlay">
+          <div className="editor-form-panel">
             <CategoryForm
               name={editingCategory}
               fieldConfig={categoryFields[editingCategory] || {}}
               allItems={items}
               onSave={handleEditCategorySave}
               onCancel={() => setEditingCategory(null)}
+              onDelete={() => handleDeleteCategory(editingCategory)}
             />
           </div>
         </div>
