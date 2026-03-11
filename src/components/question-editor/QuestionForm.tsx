@@ -24,9 +24,9 @@ function getAncestors(questionId: string, allQuestions: QuestionConfig[]): Quest
 export default function QuestionForm({ question, allQuestions, onSave, onCancel }: Props) {
   const ancestors = question.parentId ? getAncestors(question.id, allQuestions) : [];
 
-  // For nested questions, default showWhen to parent's field if not already set
+  // For nested questions, default showWhen to parent's field with "includes any"
   const defaultShowWhen = ancestors.length > 0 && !question.showWhen
-    ? { field: ancestors[0].field }
+    ? { field: ancestors[0].field, includes: '' }
     : undefined;
 
   const [draft, setDraft] = useState<QuestionConfig>({
@@ -87,9 +87,8 @@ export default function QuestionForm({ question, allQuestions, onSave, onCancel 
       return;
     }
     const condition: ShowWhenCondition = { field };
-    if (key && value) {
-      (condition as unknown as Record<string, string>)[key] = value;
-    }
+    const effectiveKey = key || 'includes';
+    (condition as unknown as Record<string, string>)[effectiveKey] = value;
     setDraft({ ...draft, showWhen: condition });
   };
 
@@ -105,8 +104,8 @@ export default function QuestionForm({ question, allQuestions, onSave, onCancel 
       : draft.showWhen.equals !== undefined ? 'equals'
       : draft.showWhen.notIncludes !== undefined ? 'notIncludes'
       : draft.showWhen.notEquals !== undefined ? 'notEquals'
-      : '')
-    : '';
+      : 'includes')
+    : 'includes';
   const showWhenValue = draft.showWhen
     ? (draft.showWhen.includes ?? draft.showWhen.equals ?? draft.showWhen.notIncludes ?? draft.showWhen.notEquals ?? '')
     : '';
@@ -262,7 +261,7 @@ export default function QuestionForm({ question, allQuestions, onSave, onCancel 
                       onChange={(e) => handleShowWhenChange(showWhenField, showWhenType, e.target.value)}
                       className="question-select"
                     >
-                      <option value="">Select a value...</option>
+                      <option value="">Any</option>
                       {selectedAncestor.baseOptions.map((opt) => (
                         <option key={opt.value} value={opt.value}>{opt.label}</option>
                       ))}

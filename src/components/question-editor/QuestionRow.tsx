@@ -2,6 +2,7 @@ import type { QuestionConfig } from '../../logic/types';
 
 interface Props {
   question: QuestionConfig;
+  allQuestions: QuestionConfig[];
   depth: number;
   index: number;
   siblingCount: number;
@@ -14,22 +15,33 @@ interface Props {
   onOutdent: () => void;
 }
 
-function describeShowWhen(q: QuestionConfig): string | null {
+function describeShowWhen(q: QuestionConfig, allQuestions: QuestionConfig[]): string | null {
   if (!q.showWhen) return null;
   const { field, includes, equals, notIncludes, notEquals } = q.showWhen;
-  const label = field.replace(/_/g, ' ');
-  if (includes) return `when ${label} includes "${includes.replace(/_/g, ' ')}"`;
-  if (equals) return `when ${label} = "${equals.replace(/_/g, ' ')}"`;
-  if (notIncludes) return `when ${label} excludes "${notIncludes.replace(/_/g, ' ')}"`;
-  if (notEquals) return `when ${label} ≠ "${notEquals.replace(/_/g, ' ')}"`;
+  const parent = allQuestions.find((p) => p.field === field);
+  const fieldLabel = parent?.label || field.replace(/_/g, ' ');
+
+  const formatValue = (val: string) => {
+    if (!val) return 'Any';
+    if (parent) {
+      const opt = parent.baseOptions.find((o) => o.value === val);
+      if (opt) return opt.label;
+    }
+    return val.replace(/_/g, ' ');
+  };
+
+  if (includes !== undefined) return `when ${fieldLabel} includes ${formatValue(includes)}`;
+  if (equals !== undefined) return `when ${fieldLabel} = ${formatValue(equals)}`;
+  if (notIncludes !== undefined) return `when ${fieldLabel} excludes ${formatValue(notIncludes)}`;
+  if (notEquals !== undefined) return `when ${fieldLabel} ≠ ${formatValue(notEquals)}`;
   return null;
 }
 
 export default function QuestionRow({
-  question, depth, index, siblingCount, canIndent, canOutdent,
+  question, allQuestions, depth, index, siblingCount, canIndent, canOutdent,
   onEdit, onDelete, onMove, onIndent, onOutdent,
 }: Props) {
-  const condition = describeShowWhen(question);
+  const condition = describeShowWhen(question, allQuestions);
 
   return (
     <div className="question-row" style={{ marginLeft: `${depth * 1.5}rem` }}>

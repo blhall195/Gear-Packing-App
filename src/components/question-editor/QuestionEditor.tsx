@@ -63,8 +63,8 @@ export default function QuestionEditor() {
     if (exists) {
       setQuestions(questions.map((q) => (q.id === updated.id ? updated : q)));
     } else {
-      const siblings = questions.filter((q) => q.parentId === updated.parentId);
-      updated.order = siblings.length;
+      const siblings = getSiblings(questions, updated.parentId);
+      updated.order = siblings.length > 0 ? Math.max(...siblings.map((q) => q.order)) + 1 : 0;
       setQuestions([...questions, updated]);
     }
     setEditingId(null);
@@ -133,7 +133,7 @@ export default function QuestionEditor() {
 
     const newParent = siblings[idx - 1];
     const newSiblings = getSiblings(questions, newParent.id);
-    const newOrder = newSiblings.length; // Add at end of new parent's children
+    const newOrder = newSiblings.length > 0 ? Math.max(...newSiblings.map((q) => q.order)) + 1 : 0;
 
     setQuestions(questions.map((item) =>
       item.id === id ? { ...item, parentId: newParent.id, order: newOrder } : item,
@@ -186,7 +186,7 @@ export default function QuestionEditor() {
   const handleAdd = () => {
     const newQ = createEmptyQuestion();
     const topLevel = getSiblings(questions, null);
-    newQ.order = topLevel.length;
+    newQ.order = topLevel.length > 0 ? Math.max(...topLevel.map((q) => q.order)) + 1 : 0;
     setEditingId(newQ.id);
     setQuestions([...questions, newQ]);
   };
@@ -210,6 +210,7 @@ export default function QuestionEditor() {
         <div key={node.question.id}>
           <QuestionRow
             question={node.question}
+            allQuestions={questions}
             depth={depth}
             index={index}
             siblingCount={nodes.length}
