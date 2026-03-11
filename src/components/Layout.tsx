@@ -8,7 +8,7 @@ function getInitialTheme(): 'light' | 'dark' {
     const stored = localStorage.getItem(THEME_KEY);
     if (stored === 'dark' || stored === 'light') return stored;
   } catch { /* ignore */ }
-  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  return 'light';
 }
 
 export default function Layout() {
