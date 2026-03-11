@@ -58,12 +58,6 @@ function groupByCategory(items: GearItem[], order: string[]): [string, GearItem[
   });
 }
 
-function getCategoryNames(items: GearItem[], order: string[]): string[] {
-  const cats = new Set(items.map((i) => i.category || 'Uncategorised'));
-  const ordered = order.filter((c) => cats.has(c));
-  const remaining = [...cats].filter((c) => !order.includes(c));
-  return [...ordered, ...remaining];
-}
 
 export default function GearEditor() {
   const { items, setItems, categoryFields, setCategoryFields, importFromFile, resetToDefault, isCustom } = useGear();
