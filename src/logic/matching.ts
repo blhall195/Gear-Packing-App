@@ -1,26 +1,33 @@
 import type { GearItem, TripAnswers } from './types';
-import { CONDITION_FIELDS } from './types';
 
 export function matchGear(items: GearItem[], trip: TripAnswers): GearItem[] {
+  const seen = new Set<string>();
   return items.filter((item) => {
+    const key = `${item.category}::${item.name}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
     if (item.always) return true;
 
-    for (const field of CONDITION_FIELDS) {
-      const itemValues = item[field.key] as string[];
-      if (itemValues.length === 0) continue;
+    // Dynamically check all array fields on the item (handles custom question fields)
+    let hasCriteria = false;
+    for (const [fieldKey, fieldValue] of Object.entries(item)) {
+      if (!Array.isArray(fieldValue) || fieldValue.length === 0) continue;
 
-      const tripValue = trip[field.key];
+      hasCriteria = true;
+      const tripValue = trip[fieldKey];
 
-      if (tripValue === null) return false;
+      // Item requires this field but trip hasn't answered → no match
+      if (tripValue === null || tripValue === undefined) return false;
 
-      if (field.multi) {
-        const tripArray = tripValue as string[];
-        const hasOverlap = itemValues.some((v) => tripArray.includes(v));
-        if (!hasOverlap) return false;
+      if (Array.isArray(tripValue)) {
+        if (!fieldValue.some((v: string) => (tripValue as string[]).includes(v))) return false;
       } else {
-        if (!itemValues.includes(tripValue as string)) return false;
+        if (!fieldValue.includes(tripValue as string)) return false;
       }
     }
+
+    // No criteria and not marked "always" → don't include
+    if (!hasCriteria) return false;
 
     return true;
   });

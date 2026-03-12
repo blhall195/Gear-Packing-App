@@ -96,7 +96,7 @@ export default function CategoryGroup({
         >{collapsed ? '\u25B2' : '\u25BC'}</button>
       </h3>
       {!collapsed && <div className="category-items">
-        {items.map((item) => (
+        {[...items].sort((a, b) => (a.optional ? 1 : 0) - (b.optional ? 1 : 0)).map((item) => (
           <PackingItem
             key={item.id}
             name={item.name}

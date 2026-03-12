@@ -141,6 +141,18 @@ export default function Questionnaire() {
         }
       }
 
+      // Copy any additional question fields not in CONDITION_FIELDS (e.g. nested custom questions)
+      for (const q of questions) {
+        const key = q.field;
+        if (key in finalAnswers) continue; // already set above
+        const draftVal = draft[key];
+        if (q.selectMode === 'multi') {
+          (finalAnswers as Record<string, unknown>)[key] = (draftVal as string[]) || [];
+        } else {
+          (finalAnswers as Record<string, unknown>)[key] = (draftVal as string) || null;
+        }
+      }
+
       // Apply auto-values for skipped questions
       for (const q of questions) {
         if (q.skip?.(draft)) {

@@ -195,6 +195,7 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 0.4rem;
   padding: 0.6rem 1.25rem;
   border-radius: var(--radius);
   border: 1px solid var(--color-border);
@@ -638,6 +639,12 @@ body {
   margin-bottom: 1rem;
 }
 
+.editor-title-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 .editor-header h2 {
   font-size: 1.5rem;
 }
@@ -791,7 +798,30 @@ body {
   align-items: center;
   border-radius: var(--radius-sm);
   cursor: pointer;
-  transition: background 0.1s;
+  transition: background 0.1s, border-color 0.15s;
+}
+
+.gear-item-row.item-drag-over {
+  border-top: 2px solid var(--color-primary);
+}
+
+.item-drag-handle {
+  cursor: grab;
+  font-size: 0.7rem;
+  color: var(--color-text-muted);
+  padding: 0.25rem 0.15rem 0.25rem 0.35rem;
+  line-height: 1;
+  opacity: 0;
+  transition: opacity 0.15s;
+  flex-shrink: 0;
+}
+
+.gear-item-row:hover .item-drag-handle {
+  opacity: 1;
+}
+
+.item-drag-handle:active {
+  cursor: grabbing;
 }
 
 .gear-item-row:hover {
@@ -825,6 +855,35 @@ body {
 
 .gear-item-badge.optional-badge {
   background: var(--color-text-muted);
+}
+
+.add-category-placeholder {
+  background: none;
+  border: 2px dashed var(--color-border);
+  border-radius: var(--radius);
+  min-height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.add-category-placeholder:hover {
+  border-color: var(--color-primary);
+  background: color-mix(in srgb, var(--color-primary) 5%, transparent);
+}
+
+.add-category-plus {
+  font-size: 2.5rem;
+  font-weight: 300;
+  color: transparent;
+  transition: color 0.2s;
+  line-height: 1;
+}
+
+.add-category-placeholder:hover .add-category-plus {
+  color: var(--color-primary);
 }
 
 .editor-empty {
@@ -1157,6 +1216,38 @@ body {
 .question-option-label-input:focus {
   outline: none;
   border-color: var(--color-primary);
+}
+
+/* Confirm Dialog */
+.confirm-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  padding: 1rem;
+}
+
+.confirm-dialog {
+  background: var(--color-surface);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  max-width: 360px;
+  width: 100%;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+}
+
+.confirm-message {
+  font-size: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.confirm-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
 }
 
 /* Print */

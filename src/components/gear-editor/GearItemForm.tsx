@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import type { GearItem } from '../../logic/types';
 import type { QuestionConfig } from '../../logic/types';
-import { CONDITION_FIELDS } from '../../logic/types';
 import { useQuestions } from '../../context/QuestionContext';
 
 interface Props {
@@ -12,21 +11,23 @@ interface Props {
   onCancel: () => void;
 }
 
-function getOptionsForField(allItems: GearItem[], field: string, questions: QuestionConfig[]): string[] {
-  const values = new Set<string>();
-  for (const item of allItems) {
-    const arr = (item as Record<string, unknown>)[field];
-    if (Array.isArray(arr)) {
-      arr.forEach((v: string) => values.add(v));
-    }
-  }
-  // Also include options from question config so newly added options appear
+function getOptionsForField(currentItem: GearItem, field: string, questions: QuestionConfig[]): string[] {
   const questionConfig = questions.find((q) => q.field === field);
+  const values = new Set<string>();
+
   if (questionConfig) {
+    // Use question baseOptions as source of truth
     for (const opt of questionConfig.baseOptions) {
       values.add(opt.value);
     }
   }
+
+  // Include values on the current item (so stale values can be seen and unticked)
+  const currentArr = (currentItem as Record<string, unknown>)[field];
+  if (Array.isArray(currentArr)) {
+    currentArr.forEach((v: string) => values.add(v));
+  }
+
   return Array.from(values).sort();
 }
 
@@ -120,44 +121,47 @@ export default function GearItemForm({ item, allItems, categoryFields, onSave, o
         </label>
       </div>
 
-      {!draft.always && CONDITION_FIELDS.filter((cf) => {
-        return categoryFields.includes(cf.key);
-      }).map((cf) => {
-        const options = getOptionsForField(allItems, cf.key, questions);
-        const selected = (draft as Record<string, unknown>)[cf.key] as string[];
+      {!draft.always && questions
+        .filter((q) => q.field && categoryFields.includes(q.field))
+        .map((q) => {
+        const options = getOptionsForField(draft, q.field, questions);
+        const selected = ((draft as Record<string, unknown>)[q.field] as string[]) || [];
 
         return (
-          <div key={cf.key} className="form-field">
-            <label>{cf.label}</label>
+          <div key={q.field} className="form-field">
+            <label>{q.label}</label>
             <div className="condition-options">
-              {options.map((opt) => (
-                <label key={opt} className="condition-checkbox">
-                  <input
-                    type="checkbox"
-                    checked={selected.includes(opt)}
-                    onChange={() => handleToggleCondition(cf.key, opt)}
-                  />
-                  {opt.replace(/_/g, ' ')}
-                </label>
-              ))}
+              {options.map((opt) => {
+                const optLabel = q.baseOptions.find(o => o.value === opt)?.label || opt.replace(/_/g, ' ');
+                return (
+                  <label key={opt} className="condition-checkbox">
+                    <input
+                      type="checkbox"
+                      checked={selected.includes(opt)}
+                      onChange={() => handleToggleCondition(q.field, opt)}
+                    />
+                    {optLabel}
+                  </label>
+                );
+              })}
             </div>
             <div className="add-new-value">
               <input
                 type="text"
-                placeholder={`Add new ${cf.label.toLowerCase()}...`}
-                value={newValues[cf.key] || ''}
-                onChange={(e) => setNewValues({ ...newValues, [cf.key]: e.target.value })}
+                placeholder={`Add new ${q.label.toLowerCase()}...`}
+                value={newValues[q.field] || ''}
+                onChange={(e) => setNewValues({ ...newValues, [q.field]: e.target.value })}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
                     e.preventDefault();
-                    handleAddNewValue(cf.key);
+                    handleAddNewValue(q.field);
                   }
                 }}
               />
               <button
                 type="button"
                 className="btn btn-small"
-                onClick={() => handleAddNewValue(cf.key)}
+                onClick={() => handleAddNewValue(q.field)}
               >
                 Add
               </button>

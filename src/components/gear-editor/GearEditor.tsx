@@ -1,10 +1,12 @@
 import { useState, useMemo, useRef, useCallback } from 'react';
 import type { DragEvent } from 'react';
-import type { GearItem, CategoryFieldConfig } from '../../logic/types';
-import { CATEGORY_ORDER, CONDITION_FIELDS } from '../../logic/types';
+import type { GearItem, CategoryFieldConfig, QuestionConfig } from '../../logic/types';
+import { CATEGORY_ORDER } from '../../logic/types';
+import { useQuestions } from '../../context/QuestionContext';
 import GearItemRow from './GearItemRow';
 import GearItemForm from './GearItemForm';
 import CategoryForm from './CategoryForm';
+import ConfirmDialog from '../ConfirmDialog';
 import { useGear } from '../../context/GearContext';
 
 function generateId(): string {
@@ -59,8 +61,43 @@ function groupByCategory(items: GearItem[], order: string[]): [string, GearItem[
 }
 
 
+/** Return only config fields whose full ancestor chain in the question tree is also in the config */
+function getVisibleFields(config: CategoryFieldConfig, questions: QuestionConfig[]): string[] {
+  const selected = new Set(Object.keys(config));
+  const withField = questions.filter((q) => q.field);
+
+  interface Node { key: string; children: Node[] }
+  const seen = new Set<string>();
+  function buildChildren(parentId: string | null): Node[] {
+    return withField
+      .filter((q) => q.parentId === parentId)
+      .sort((a, b) => a.order - b.order)
+      .reduce<Node[]>((acc, q) => {
+        if (!seen.has(q.field)) {
+          seen.add(q.field);
+          acc.push({ key: q.field, children: buildChildren(q.id) });
+        }
+        return acc;
+      }, []);
+  }
+  const tree = buildChildren(null);
+
+  const result: string[] = [];
+  function collect(nodes: Node[]) {
+    for (const node of nodes) {
+      if (selected.has(node.key)) {
+        result.push(node.key);
+        collect(node.children);
+      }
+    }
+  }
+  collect(tree);
+  return result;
+}
+
 export default function GearEditor() {
   const { items, setItems, categoryFields, setCategoryFields, importFromFile, resetToDefault, isCustom } = useGear();
+  const { questions } = useQuestions();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [filter, setFilter] = useState('');
   const [collapsedCategories, setCollapsedCategories] = useState<Set<string>>(new Set());
@@ -68,8 +105,11 @@ export default function GearEditor() {
   const [warningDismissed, setWarningDismissed] = useState(false);
   const [editingCategory, setEditingCategory] = useState<string | null>(null);
   const [addingCategory, setAddingCategory] = useState(false);
+  const [confirmAction, setConfirmAction] = useState<{ message: string; action: () => void } | null>(null);
   const [dragOverCategory, setDragOverCategory] = useState<string | null>(null);
   const dragCategory = useRef<string | null>(null);
+  const [dragOverItemId, setDragOverItemId] = useState<string | null>(null);
+  const dragItemId = useRef<string | null>(null);
 
   const isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
 
@@ -122,6 +162,47 @@ export default function GearEditor() {
     setDragOverCategory(null);
   }, []);
 
+  const handleItemDragStart = useCallback((itemId: string) => {
+    dragItemId.current = itemId;
+  }, []);
+
+  const handleItemDragOver = useCallback((itemId: string, e: DragEvent) => {
+    if (!dragItemId.current || dragItemId.current === itemId) return;
+    e.preventDefault();
+    e.stopPropagation();
+    setDragOverItemId(itemId);
+  }, []);
+
+  const handleItemDrop = useCallback((targetId: string, e: DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const sourceId = dragItemId.current;
+    if (!sourceId || sourceId === targetId) {
+      setDragOverItemId(null);
+      return;
+    }
+
+    const sourceIdx = items.findIndex((i) => i.id === sourceId);
+    const targetIdx = items.findIndex((i) => i.id === targetId);
+    if (sourceIdx === -1 || targetIdx === -1 || items[sourceIdx].category !== items[targetIdx].category) {
+      setDragOverItemId(null);
+      dragItemId.current = null;
+      return;
+    }
+
+    const newItems = [...items];
+    const [moved] = newItems.splice(sourceIdx, 1);
+    newItems.splice(targetIdx, 0, moved);
+    setItems(newItems);
+    setDragOverItemId(null);
+    dragItemId.current = null;
+  }, [items, setItems]);
+
+  const handleItemDragEnd = useCallback(() => {
+    dragItemId.current = null;
+    setDragOverItemId(null);
+  }, []);
+
   const selectedItem = items.find((i) => i.id === selectedId) || null;
 
   const handleSave = (updated: GearItem) => {
@@ -130,9 +211,14 @@ export default function GearEditor() {
   };
 
   const handleDelete = (id: string) => {
-    if (!confirm('Delete this item?')) return;
-    setItems(items.filter((i) => i.id !== id));
-    if (selectedId === id) setSelectedId(null);
+    setConfirmAction({
+      message: 'Delete this item?',
+      action: () => {
+        setItems(items.filter((i) => i.id !== id));
+        if (selectedId === id) setSelectedId(null);
+        setConfirmAction(null);
+      },
+    });
   };
 
   const handleAdd = (category?: string) => {
@@ -164,40 +250,48 @@ export default function GearEditor() {
   };
 
   const handleDeleteCategory = (category: string) => {
-    if (!confirm(`Delete "${category}" and all its items?`)) return;
-    setItems(items.filter((i) => i.category !== category));
-    const updated = { ...categoryFields };
-    delete updated[category];
-    setCategoryFields(updated);
-    setSelectedId(null);
-    setEditingCategory(null);
+    setConfirmAction({
+      message: `Delete "${category}" and all its items?`,
+      action: () => {
+        setItems(items.filter((i) => i.category !== category));
+        const updated = { ...categoryFields };
+        delete updated[category];
+        setCategoryFields(updated);
+        setSelectedId(null);
+        setEditingCategory(null);
+        setConfirmAction(null);
+      },
+    });
   };
 
   const getFieldsForCategory = (category: string): string[] => {
     const config = categoryFields[category];
-    return config ? Object.keys(config) : CONDITION_FIELDS.map((cf) => cf.key);
+    if (config) return getVisibleFields(config, questions);
+    // Fallback: all question fields
+    return questions.filter((q) => q.field).map((q) => q.field);
   };
 
   return (
     <div className="gear-editor">
       <div className="editor-header">
-        <h2>Gear Editor</h2>
-        <div className="editor-actions">
-          <button type="button" className="btn btn-primary" onClick={() => setAddingCategory(true)}>
-            Add Category
-          </button>
+        <div className="editor-title-group">
+          <h2>Gear Editor</h2>
           <button type="button" className="btn btn-secondary" onClick={() => exportJson(items)}>
-            Download Gear Settings
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Download
           </button>
           <button type="button" className="btn btn-secondary" onClick={importFromFile}>
-            Upload Gear Settings
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            Upload
           </button>
-          {isCustom && (
+        </div>
+        {isCustom && (
+          <div className="editor-actions">
             <button type="button" className="btn btn-danger" onClick={resetToDefault}>
               Reset to Default
             </button>
-          )}
-        </div>
+          </div>
+        )}
       </div>
 
       {isCustom && !isLocal && !warningDismissed && (
@@ -268,8 +362,13 @@ export default function GearEditor() {
                   key={item.id}
                   item={item}
                   isSelected={item.id === selectedId}
+                  isDragOver={item.id === dragOverItemId}
                   onClick={() => setSelectedId(item.id === selectedId ? null : item.id)}
                   onDelete={() => handleDelete(item.id)}
+                  onDragStart={() => handleItemDragStart(item.id)}
+                  onDragOver={(e) => handleItemDragOver(item.id, e)}
+                  onDrop={(e) => handleItemDrop(item.id, e)}
+                  onDragEnd={handleItemDragEnd}
                 />
               ))}
               <button
@@ -280,6 +379,14 @@ export default function GearEditor() {
             </div>}
           </div>
         ))}
+        <button
+          type="button"
+          className="add-category-placeholder"
+          onClick={() => setAddingCategory(true)}
+          title="Add new category"
+        >
+          <span className="add-category-plus">+</span>
+        </button>
         {grouped.length === 0 && (
           <p className="editor-empty">No items found.</p>
         )}
@@ -306,7 +413,6 @@ export default function GearEditor() {
             <CategoryForm
               name=""
               fieldConfig={{}}
-              allItems={items}
               onSave={handleAddCategorySave}
               onCancel={() => setAddingCategory(false)}
               isNew
@@ -321,13 +427,20 @@ export default function GearEditor() {
             <CategoryForm
               name={editingCategory}
               fieldConfig={categoryFields[editingCategory] || {}}
-              allItems={items}
               onSave={handleEditCategorySave}
               onCancel={() => setEditingCategory(null)}
               onDelete={() => handleDeleteCategory(editingCategory)}
             />
           </div>
         </div>
+      )}
+
+      {confirmAction && (
+        <ConfirmDialog
+          message={confirmAction.message}
+          onConfirm={confirmAction.action}
+          onCancel={() => setConfirmAction(null)}
+        />
       )}
     </div>
   );

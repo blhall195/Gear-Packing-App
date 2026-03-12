@@ -12,14 +12,24 @@ export interface QuestionDef {
   autoValue?: (answers: Partial<TripAnswers>) => string | null;
 }
 
+/** Check if a value is a meaningful (non-empty) answer */
+function hasAnswer(val: unknown): boolean {
+  if (val === undefined || val === null) return false;
+  if (Array.isArray(val)) return val.length > 0;
+  if (val === '') return false;
+  return true;
+}
+
 function evaluateShowWhen(condition: ShowWhenCondition): (answers: Partial<TripAnswers>) => boolean {
   return (answers) => {
     const val = answers[condition.field];
 
     // If the referenced field hasn't been answered yet, hide the question
-    if (val === undefined || val === null) return true;
+    if (!hasAnswer(val)) return true;
 
+    // Empty string means "Any" — show when field has any non-empty answer
     if (condition.includes !== undefined) {
+      if (!condition.includes) return false; // "Any" — field is answered, so show
       if (Array.isArray(val)) {
         return !(val as string[]).includes(condition.includes);
       }
@@ -27,6 +37,7 @@ function evaluateShowWhen(condition: ShowWhenCondition): (answers: Partial<TripA
     }
 
     if (condition.equals !== undefined) {
+      if (!condition.equals) return false;
       if (Array.isArray(val)) {
         return !(val as string[]).includes(condition.equals);
       }
@@ -34,6 +45,7 @@ function evaluateShowWhen(condition: ShowWhenCondition): (answers: Partial<TripA
     }
 
     if (condition.notIncludes !== undefined) {
+      if (!condition.notIncludes) return false;
       if (Array.isArray(val)) {
         return (val as string[]).includes(condition.notIncludes);
       }
@@ -41,12 +53,14 @@ function evaluateShowWhen(condition: ShowWhenCondition): (answers: Partial<TripA
     }
 
     if (condition.notEquals !== undefined) {
+      if (!condition.notEquals) return false;
       if (Array.isArray(val)) {
         return (val as string[]).includes(condition.notEquals);
       }
       return val === condition.notEquals;
     }
 
+    // No condition key — treat as "Any"
     return false;
   };
 }
@@ -66,7 +80,8 @@ export function buildQuestions(
   // Sort: top-level by order, then children after their parent by order
   const sorted = flattenTree(configs);
 
-  return sorted.map((config) => {
+  // Build defs first, then chain parent skip logic
+  const defs: QuestionDef[] = sorted.map((config) => {
     const def: QuestionDef = {
       id: config.id,
       parentId: config.parentId,
@@ -86,6 +101,21 @@ export function buildQuestions(
 
     return def;
   });
+
+  // Chain: a question is skipped if it or any ancestor is skipped
+  const defMap = new Map(defs.map((d) => [d.id, d]));
+  for (const def of defs) {
+    if (!def.parentId) continue;
+    const parent = defMap.get(def.parentId);
+    if (!parent?.skip) continue;
+    const ownSkip = def.skip;
+    const parentSkip = parent.skip;
+    def.skip = ownSkip
+      ? (answers) => parentSkip(answers) || ownSkip(answers)
+      : parentSkip;
+  }
+
+  return defs;
 }
 
 /** Flatten question tree: top-level sorted by order, children inserted after parent */

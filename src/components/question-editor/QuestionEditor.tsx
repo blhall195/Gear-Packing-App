@@ -3,6 +3,7 @@ import type { QuestionConfig } from '../../logic/types';
 import { useQuestions } from '../../context/QuestionContext';
 import QuestionRow from './QuestionRow';
 import QuestionForm from './QuestionForm';
+import ConfirmDialog from '../ConfirmDialog';
 
 function generateId(): string {
   if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
@@ -54,6 +55,7 @@ export default function QuestionEditor() {
   const { questions, setQuestions, importFromFile, resetToDefault, isCustom } = useQuestions();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [warningDismissed, setWarningDismissed] = useState(false);
+  const [confirmAction, setConfirmAction] = useState<{ message: string; action: () => void } | null>(null);
 
   const isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
   const tree = buildTree(questions);
@@ -85,23 +87,27 @@ export default function QuestionEditor() {
       msg += `\n\n${depByShowWhen.length} question(s) reference this field in their show-when condition.`;
     }
 
-    if (!confirm(msg)) return;
-
-    const idsToRemove = new Set<string>();
-    function collectIds(parentId: string) {
-      idsToRemove.add(parentId);
-      for (const q of questions) {
-        if (q.parentId === parentId) {
-          collectIds(q.id);
+    setConfirmAction({
+      message: msg,
+      action: () => {
+        const idsToRemove = new Set<string>();
+        function collectIds(parentId: string) {
+          idsToRemove.add(parentId);
+          for (const q of questions) {
+            if (q.parentId === parentId) {
+              collectIds(q.id);
+            }
+          }
         }
-      }
-    }
-    collectIds(id);
+        collectIds(id);
 
-    setQuestions(questions.filter((q) => !idsToRemove.has(q.id)));
-    if (editingId && idsToRemove.has(editingId)) {
-      setEditingId(null);
-    }
+        setQuestions(questions.filter((q) => !idsToRemove.has(q.id)));
+        if (editingId && idsToRemove.has(editingId)) {
+          setEditingId(null);
+        }
+        setConfirmAction(null);
+      },
+    });
   };
 
   const handleMove = (id: string, direction: -1 | 1) => {
@@ -284,6 +290,14 @@ export default function QuestionEditor() {
             />
           </div>
         </div>
+      )}
+
+      {confirmAction && (
+        <ConfirmDialog
+          message={confirmAction.message}
+          onConfirm={confirmAction.action}
+          onCancel={() => setConfirmAction(null)}
+        />
       )}
     </div>
   );
