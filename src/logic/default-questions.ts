@@ -26,6 +26,7 @@ export const DEFAULT_QUESTIONS: QuestionConfig[] = [
       { value: 'sunny', label: 'Sunny' },
       { value: 'mild', label: 'Mild' },
       { value: 'cold', label: 'Cold' },
+      { value: 'rain', label: 'Rain' },
     ],
     parentId: 'q-activities',
     order: 0,
@@ -48,15 +49,17 @@ export const DEFAULT_QUESTIONS: QuestionConfig[] = [
   {
     id: 'b93823fb-d7f3-4344-8d06-2190b8216040',
     field: 'Weather',
-    label: 'In what weather?',
+    label: 'Scrambling in what weather?',
     selectMode: 'single',
     baseOptions: [
       { value: 'hot_sunny', label: 'Hot' },
       { value: 'mild', label: 'Mild' },
       { value: 'cold', label: 'Cold' },
+      { value: 'rain', label: 'Rain' },
     ],
     parentId: 'e3f7f47f-bc3d-460b-87e9-a1e3c91e92dd',
     order: 0,
+    showWhen: { field: 'Scrambling grade', includes: '' },
   },
   {
     id: 'q-cavingType',
@@ -131,7 +134,7 @@ export const DEFAULT_QUESTIONS: QuestionConfig[] = [
   {
     id: 'q-weather',
     field: 'weather',
-    label: 'In what weather?',
+    label: 'What will the weather be like?',
     selectMode: 'multi',
     baseOptions: [
       { value: 'hot', label: 'Hot' },

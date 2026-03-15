@@ -2,9 +2,16 @@
   {
     "id": "2",
     "name": "Water bottle",
-    "category": "Essentials",
+    "category": "General",
     "always": false,
-    "activities": [],
+    "activities": [
+      "caving",
+      "climbing",
+      "hiking",
+      "sailing",
+      "scrambling",
+      "snowsports"
+    ],
     "climbingType": [],
     "weather": [],
     "duration": [],
@@ -13,14 +20,21 @@
     "location": [],
     "cooking": [],
     "cavingType": [],
-    "optional": false
+    "optional": true
   },
   {
     "id": "3",
     "name": "Snacks",
-    "category": "Essentials",
+    "category": "General",
     "always": false,
-    "activities": [],
+    "activities": [
+      "caving",
+      "climbing",
+      "hiking",
+      "sailing",
+      "scrambling",
+      "snowsports"
+    ],
     "climbingType": [],
     "weather": [],
     "duration": [],
@@ -29,14 +43,21 @@
     "location": [],
     "cooking": [],
     "cavingType": [],
-    "optional": false
+    "optional": true
   },
   {
     "id": "4",
     "name": "First aid kit",
-    "category": "Essentials",
+    "category": "General",
     "always": false,
-    "activities": [],
+    "activities": [
+      "caving",
+      "climbing",
+      "hiking",
+      "sailing",
+      "scrambling",
+      "snowsports"
+    ],
     "climbingType": [],
     "weather": [],
     "duration": [],
@@ -45,17 +66,18 @@
     "location": [],
     "cooking": [],
     "cavingType": [],
-    "optional": false
+    "optional": true
   },
   {
     "id": "5",
     "name": "Headtorch",
-    "category": "Essentials",
+    "category": "General",
     "always": false,
     "activities": [
       "climbing",
       "caving",
-      "hiking"
+      "hiking",
+      "scrambling"
     ],
     "climbingType": [],
     "weather": [],
@@ -66,7 +88,8 @@
     "sleepProvision": [],
     "location": [],
     "cooking": [],
-    "cavingType": []
+    "cavingType": [],
+    "optional": false
   },
   {
     "id": "6",
@@ -120,25 +143,14 @@
     "sleepProvision": [],
     "location": [],
     "cooking": [],
-    "cavingType": []
-  },
-  {
-    "id": "9",
-    "name": "Base layer bottom",
-    "category": "Clothing",
-    "always": false,
-    "activities": [],
-    "climbingType": [],
-    "weather": [
-      "cold",
-      "snow"
+    "cavingType": [],
+    "optional": false,
+    "Weather": [
+      "cold"
     ],
-    "duration": [],
-    "shelter": [],
-    "sleepProvision": [],
-    "location": [],
-    "cooking": [],
-    "cavingType": []
+    "Hiking (Weather)": [
+      "cold"
+    ]
   },
   {
     "id": "10",
@@ -148,33 +160,25 @@
     "activities": [],
     "climbingType": [],
     "weather": [
-      "rain",
-      "snow"
+      "cold",
+      "mild"
     ],
     "duration": [],
     "shelter": [],
     "sleepProvision": [],
     "location": [],
     "cooking": [],
-    "cavingType": []
-  },
-  {
-    "id": "11",
-    "name": "Waterproof trousers",
-    "category": "Clothing",
-    "always": false,
-    "activities": [],
-    "climbingType": [],
-    "weather": [
-      "rain",
-      "snow"
+    "cavingType": [],
+    "optional": false,
+    "Hiking (Weather)": [
+      "mild",
+      "cold"
     ],
-    "duration": [],
-    "shelter": [],
-    "sleepProvision": [],
-    "location": [],
-    "cooking": [],
-    "cavingType": []
+    "Scrambling grade": [],
+    "Weather": [
+      "cold",
+      "mild"
+    ]
   },
   {
     "id": "12",
@@ -185,89 +189,73 @@
     "climbingType": [],
     "weather": [
       "cold",
-      "snow"
+      "mild"
     ],
     "duration": [],
     "shelter": [],
     "sleepProvision": [],
     "location": [],
     "cooking": [],
-    "cavingType": []
-  },
-  {
-    "id": "13",
-    "name": "Sun hat",
-    "category": "Clothing",
-    "always": false,
-    "activities": [],
-    "climbingType": [],
-    "weather": [
-      "hot"
-    ],
-    "duration": [],
-    "shelter": [],
-    "sleepProvision": [],
-    "location": [],
-    "cooking": [],
-    "cavingType": []
-  },
-  {
-    "id": "14",
-    "name": "Warm hat",
-    "category": "Clothing",
-    "always": false,
-    "activities": [],
-    "climbingType": [],
-    "weather": [
+    "cavingType": [],
+    "optional": false,
+    "Hiking (Weather)": [
       "cold",
-      "snow"
+      "mild"
     ],
-    "duration": [],
-    "shelter": [],
-    "sleepProvision": [],
-    "location": [],
-    "cooking": [],
-    "cavingType": []
+    "Conditions (Caving)": [],
+    "Conditions (Sailing)": []
   },
   {
-    "id": "15",
-    "name": "Gloves",
+    "id": "2387b644-04ac-4f71-89c2-8ea0c5e1f8a1",
+    "name": "Down Jacket",
     "category": "Clothing",
     "always": false,
+    "optional": false,
     "activities": [],
     "climbingType": [],
+    "cavingType": [],
     "weather": [
-      "cold",
-      "snow"
+      "cold"
     ],
     "duration": [],
     "shelter": [],
     "sleepProvision": [],
     "location": [],
     "cooking": [],
-    "cavingType": []
+    "Hiking (Weather)": [
+      "cold"
+    ],
+    "Weather": [
+      "cold"
+    ]
   },
   {
-    "id": "16",
-    "name": "Spare socks",
+    "id": "11",
+    "name": "Waterproof trousers",
     "category": "Clothing",
     "always": false,
     "activities": [],
     "climbingType": [],
     "weather": [],
-    "duration": [
-      "multi_day"
-    ],
+    "duration": [],
     "shelter": [],
     "sleepProvision": [],
     "location": [],
     "cooking": [],
-    "cavingType": []
+    "cavingType": [],
+    "optional": false,
+    "Weather": [
+      "cold",
+      "rain"
+    ],
+    "Hiking (Weather)": [
+      "rain"
+    ]
   },
   {
-    "id": "17",
-    "name": "Sunscreen",
-    "category": "Essentials",
+    "id": "13",
+    "name": "Sun hat",
+    "category": "Clothing",
     "always": false,
     "activities": [],
     "climbingType": [],
@@ -281,6 +269,81 @@
     "optional": false,
     "Hiking (Weather)": [
       "sunny"
+    ]
+  },
+  {
+    "id": "14",
+    "name": "Warm hat",
+    "category": "Clothing",
+    "always": false,
+    "activities": [],
+    "climbingType": [],
+    "weather": [
+      "cold"
+    ],
+    "duration": [],
+    "shelter": [],
+    "sleepProvision": [],
+    "location": [],
+    "cooking": [],
+    "cavingType": [],
+    "optional": true,
+    "Hiking (Weather)": [
+      "cold"
+    ],
+    "Weather": [
+      "cold"
+    ]
+  },
+  {
+    "id": "15",
+    "name": "Gloves",
+    "category": "Clothing",
+    "always": false,
+    "activities": [],
+    "climbingType": [],
+    "weather": [
+      "cold"
+    ],
+    "duration": [],
+    "shelter": [],
+    "sleepProvision": [],
+    "location": [],
+    "cooking": [],
+    "cavingType": [],
+    "optional": false,
+    "Weather": [
+      "cold"
+    ],
+    "Hiking (Weather)": [
+      "cold"
+    ]
+  },
+  {
+    "id": "17",
+    "name": "Sunscreen",
+    "category": "General",
+    "always": false,
+    "activities": [],
+    "climbingType": [],
+    "weather": [
+      "hot"
+    ],
+    "duration": [],
+    "shelter": [],
+    "sleepProvision": [],
+    "location": [],
+    "cooking": [],
+    "cavingType": [],
+    "optional": false,
+    "Hiking (Weather)": [
+      "sunny"
+    ],
+    "Weather": [
+      "hot_sunny"
+    ],
+    "Conditions (Sailing)": [
+      "hot"
     ]
   },
   {
@@ -319,7 +382,10 @@
     "location": [],
     "cooking": [],
     "cavingType": [],
-    "optional": false
+    "optional": false,
+    "Scrambling grade": [
+      "grade_iii"
+    ]
   },
   {
     "id": "25",
@@ -342,14 +408,13 @@
   },
   {
     "id": "23",
-    "name": "Rope",
+    "name": "Single Rope",
     "category": "Climbing Gear",
     "always": false,
     "activities": [
       "climbing"
     ],
     "climbingType": [
-      "trad",
       "sport"
     ],
     "weather": [],
@@ -360,6 +425,24 @@
     "cooking": [],
     "cavingType": [],
     "optional": false
+  },
+  {
+    "id": "2ddc2b0b-d8e9-4c73-b1b3-7a9894ab0e83",
+    "name": "Half Ropes",
+    "category": "Climbing Gear",
+    "always": false,
+    "optional": false,
+    "activities": [],
+    "climbingType": [
+      "trad"
+    ],
+    "cavingType": [],
+    "weather": [],
+    "duration": [],
+    "shelter": [],
+    "sleepProvision": [],
+    "location": [],
+    "cooking": []
   },
   {
     "id": "092b2cc7-c6fa-4e86-b1c8-f1ad6fcb3575",
@@ -597,7 +680,7 @@
   },
   {
     "id": "f81760d6-0480-4935-a22a-7576297b0ce5",
-    "name": "Spare underware",
+    "name": "Spare socks/underwear",
     "category": "Caving Gear",
     "always": false,
     "optional": false,
@@ -865,13 +948,14 @@
   {
     "id": "5efbb081-c1cb-47b8-b7bd-3766a0cb1e24",
     "name": "Backpack",
-    "category": "Essentials",
+    "category": "General",
     "always": false,
     "optional": false,
     "activities": [
       "climbing",
       "hiking",
-      "scrambling"
+      "scrambling",
+      "snowsports"
     ],
     "climbingType": [],
     "cavingType": [],
@@ -903,21 +987,32 @@
   {
     "id": "d7a3167b-549f-4c09-8ffb-0e2015b4ab22",
     "name": "Sunglasses",
-    "category": "Essentials",
+    "category": "General",
     "always": false,
     "optional": false,
-    "activities": [
-      "hiking",
-      "climbing"
-    ],
+    "activities": [],
     "climbingType": [],
     "cavingType": [],
-    "weather": [],
+    "weather": [
+      "mild",
+      "hot"
+    ],
     "duration": [],
     "shelter": [],
     "sleepProvision": [],
     "location": [],
-    "cooking": []
+    "cooking": [],
+    "Hiking (Weather)": [
+      "sunny",
+      "mild"
+    ],
+    "Weather": [
+      "hot_sunny",
+      "mild"
+    ],
+    "Conditions (Sailing)": [
+      "hot"
+    ]
   },
   {
     "id": "982df0db-2842-4945-94ad-10496758bcd3",
@@ -925,7 +1020,9 @@
     "category": "Water Sports",
     "always": false,
     "optional": false,
-    "activities": [],
+    "activities": [
+      "sailing"
+    ],
     "climbingType": [],
     "cavingType": [],
     "weather": [],
@@ -1098,7 +1195,8 @@
     "location": [],
     "cooking": [],
     "Snow Sports": [
-      "skiing"
+      "skiing",
+      "snowboarding"
     ]
   },
   {
@@ -1253,6 +1351,144 @@
     "optional": false,
     "activities": [
       "climbing"
+    ],
+    "climbingType": [],
+    "cavingType": [],
+    "weather": [],
+    "duration": [],
+    "shelter": [],
+    "sleepProvision": [],
+    "location": [],
+    "cooking": []
+  },
+  {
+    "id": "8d1d3621-455d-4793-a9d0-e222771d5a17",
+    "name": "Chalk",
+    "category": "Climbing Gear",
+    "always": false,
+    "optional": false,
+    "activities": [],
+    "climbingType": [],
+    "cavingType": [],
+    "weather": [],
+    "duration": [],
+    "shelter": [],
+    "sleepProvision": [],
+    "location": [],
+    "cooking": []
+  },
+  {
+    "id": "15108571-f2a8-40e2-ba72-3a316e66fb63",
+    "name": "Climbing Tape",
+    "category": "Climbing Gear",
+    "always": false,
+    "optional": false,
+    "activities": [],
+    "climbingType": [],
+    "cavingType": [],
+    "weather": [],
+    "duration": [],
+    "shelter": [],
+    "sleepProvision": [],
+    "location": [],
+    "cooking": []
+  },
+  {
+    "id": "d9f5b532-ffee-4c20-b730-bdcc1a2bb78d",
+    "name": "Walking Boots",
+    "category": "Clothing",
+    "always": false,
+    "optional": false,
+    "activities": [
+      "hiking"
+    ],
+    "climbingType": [],
+    "cavingType": [],
+    "weather": [],
+    "duration": [],
+    "shelter": [],
+    "sleepProvision": [],
+    "location": [],
+    "cooking": []
+  },
+  {
+    "id": "955a0a90-b84c-4c54-8fe5-7e2608df6a5f",
+    "name": "Walking Ice Axe",
+    "category": "Winter Mountaineering",
+    "always": false,
+    "optional": false,
+    "activities": [],
+    "climbingType": [],
+    "cavingType": [],
+    "weather": [],
+    "duration": [],
+    "shelter": [],
+    "sleepProvision": [],
+    "location": [],
+    "cooking": []
+  },
+  {
+    "id": "16ecd9fb-27df-4ac3-a8b0-92616a73c03d",
+    "name": "C2 Crampons",
+    "category": "Winter Mountaineering",
+    "always": false,
+    "optional": false,
+    "activities": [],
+    "climbingType": [],
+    "cavingType": [],
+    "weather": [],
+    "duration": [],
+    "shelter": [],
+    "sleepProvision": [],
+    "location": [],
+    "cooking": []
+  },
+  {
+    "id": "e274d24e-40b6-4dc3-b225-aa2a3f52362a",
+    "name": "B2 Boots",
+    "category": "Winter Mountaineering",
+    "always": false,
+    "optional": false,
+    "activities": [],
+    "climbingType": [],
+    "cavingType": [],
+    "weather": [],
+    "duration": [],
+    "shelter": [],
+    "sleepProvision": [],
+    "location": [],
+    "cooking": []
+  },
+  {
+    "id": "57040e11-5b05-4558-953c-9fc328c1bd0c",
+    "name": "Lunch",
+    "category": "General",
+    "always": false,
+    "optional": true,
+    "activities": [
+      "climbing",
+      "hiking",
+      "scrambling",
+      "sailing",
+      "snowsports"
+    ],
+    "climbingType": [],
+    "cavingType": [],
+    "weather": [],
+    "duration": [],
+    "shelter": [],
+    "sleepProvision": [],
+    "location": [],
+    "cooking": []
+  },
+  {
+    "id": "d5ef4063-592a-469b-9aa5-5dec18ce8615",
+    "name": "Swimming Trunks",
+    "category": "SnowSports",
+    "always": false,
+    "optional": false,
+    "activities": [
+      "snowsports"
     ],
     "climbingType": [],
     "cavingType": [],

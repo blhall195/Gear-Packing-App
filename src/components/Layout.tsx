@@ -14,7 +14,6 @@ function getInitialTheme(): 'light' | 'dark' {
 export default function Layout() {
   const location = useLocation();
   const [theme, setTheme] = useState<'light' | 'dark'>(getInitialTheme);
-
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
     localStorage.setItem(THEME_KEY, theme);

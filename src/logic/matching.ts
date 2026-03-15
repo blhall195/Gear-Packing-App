@@ -10,15 +10,19 @@ export function matchGear(items: GearItem[], trip: TripAnswers): GearItem[] {
 
     // Dynamically check all array fields on the item (handles custom question fields)
     let hasCriteria = false;
+    let hasMatchedField = false;
     for (const [fieldKey, fieldValue] of Object.entries(item)) {
       if (!Array.isArray(fieldValue) || fieldValue.length === 0) continue;
 
       hasCriteria = true;
       const tripValue = trip[fieldKey];
 
-      // Item requires this field but trip hasn't answered → no match
-      if (tripValue === null || tripValue === undefined) return false;
+      // Trip hasn't answered this field (null, undefined, or empty array) → skip it
+      if (tripValue === null || tripValue === undefined) continue;
+      if (Array.isArray(tripValue) && tripValue.length === 0) continue;
 
+      // Field was answered — check for overlap
+      hasMatchedField = true;
       if (Array.isArray(tripValue)) {
         if (!fieldValue.some((v: string) => (tripValue as string[]).includes(v))) return false;
       } else {
@@ -26,8 +30,10 @@ export function matchGear(items: GearItem[], trip: TripAnswers): GearItem[] {
       }
     }
 
-    // No criteria and not marked "always" → don't include
+    // No criteria at all → don't include
     if (!hasCriteria) return false;
+    // Has criteria but none of the relevant questions were answered → don't include
+    if (!hasMatchedField) return false;
 
     return true;
   });
